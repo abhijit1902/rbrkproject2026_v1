@@ -315,6 +315,11 @@ app.post('/api/feedback', (req, res) => {
   res.json({ success: true, count: userFeedback.length });
 });
 
-app.listen(PORT, () => {
-  console.log(`Customer Intelligence API Server running on port ${PORT}`);
-});
+// On Vercel the platform serves the exported app; locally we listen on a port
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Customer Intelligence API Server running on port ${PORT}`);
+  });
+}
+
+export default app;
