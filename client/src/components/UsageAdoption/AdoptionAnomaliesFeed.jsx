@@ -1,4 +1,5 @@
 import React from 'react';
+import { ADOPTION_THRESHOLD } from './FeatureUtilizationTable';
 
 // Builds the AI summary text from the account's usage telemetry
 export function buildUsageSummary(usage) {
@@ -19,7 +20,7 @@ export function buildUsageSummary(usage) {
   const neverActivated = products.filter(p => p.activated === false && p.purchased);
   const notActivated = notPurchased;
   const features = usage.featuresMatrix || [];
-  const worst = [...features].sort((a, b) => (a.adoptionPct - a.cohortPct) - (b.adoptionPct - b.cohortPct))[0];
+  const worst = [...features].sort((a, b) => a.adoptionPct - b.adoptionPct)[0];
   const anomalies = usage.adoptionAnomalies || [];
   const critical = anomalies.filter(a => ['CRITICAL', 'HIGH', 'WARNING'].includes(String(a.severity).toUpperCase())).length;
 
@@ -31,8 +32,9 @@ export function buildUsageSummary(usage) {
   parts.push('Weekly active users stand at ' + usage.wau + ' (' + usage.wauDelta + '), with stickiness rated ' + String(usage.stickinessStatus).toLowerCase() + '.');
   if (worst) {
     parts.push(
-      'The largest feature adoption gap is ' + worst.feature + ' at ' + worst.adoptionPct + '% versus a ' +
-      worst.cohortPct + '% cohort benchmark.'
+      worst.adoptionPct < ADOPTION_THRESHOLD
+        ? 'The lowest feature adoption is ' + worst.feature + ' at ' + worst.adoptionPct + '%, below the ' + ADOPTION_THRESHOLD + '% threshold.'
+        : 'Every feature meets the ' + ADOPTION_THRESHOLD + '% adoption threshold; the lowest is ' + worst.feature + ' at ' + worst.adoptionPct + '%.'
     );
   }
   if (anomalies.length) {

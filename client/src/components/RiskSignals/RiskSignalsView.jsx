@@ -5,16 +5,18 @@ import SignalsFeed from './SignalsFeed';
 import EscalationTimeline from './EscalationTimeline';
 import ChurnProbabilityMatrix from './ChurnProbabilityMatrix';
 import ExpansionOpportunities from './ExpansionOpportunities';
+import RiskProfilesPanel from './RiskProfilesPanel';
 
 const TABS = [
   { id: 'overview', label: 'Risk Overview', icon: 'crisis_alert' },
   { id: 'signals', label: 'Signal Feed', icon: 'notifications_active' },
   { id: 'escalations', label: 'Escalations', icon: 'history_edu' },
   { id: 'expansion', label: 'Expansion Signals', icon: 'trending_up' },
+  { id: 'profiles', label: 'Risk Profiles', icon: 'assignment_late' },
 ];
 
-export default function RiskSignalsView({ allAccounts, onSelectAccount, onToast }) {
-  const [activeTab, setActiveTab] = useState('overview');
+export default function RiskSignalsView({ selectedAccountName, allAccounts, onSelectAccount, onToast }) {
+  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(window.location.search).get('tab') || 'overview');
   const [riskData, setRiskData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -22,7 +24,7 @@ export default function RiskSignalsView({ allAccounts, onSelectAccount, onToast 
 
   const loadRiskData = (notify = false) => {
     setLoading(true);
-    fetch('/api/risk-signals')
+    fetch('/api/risk-signals' + (selectedAccountName ? '?account=' + encodeURIComponent(selectedAccountName) : ''))
       .then(res => res.json())
       .then(data => {
         setRiskData(data);
@@ -50,7 +52,7 @@ export default function RiskSignalsView({ allAccounts, onSelectAccount, onToast 
             </span>
           </div>
           <p className="text-xs text-[#9db4e2] m-0">
-            Churn risk, early warning signals, escalation tracking and expansion opportunities across the portfolio
+            Churn risk, early warning signals, escalation tracking and expansion opportunities {selectedAccountName ? 'for ' + selectedAccountName : 'across the portfolio'}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -145,6 +147,10 @@ export default function RiskSignalsView({ allAccounts, onSelectAccount, onToast 
 
       {riskData && activeTab === 'escalations' && (
         <EscalationTimeline escalations={riskData.escalations} query={query} onToast={onToast} />
+      )}
+
+      {riskData && activeTab === 'profiles' && (
+        <RiskProfilesPanel profiles={riskData.riskProfiles || []} query={query} onSelectAccount={onSelectAccount} onToast={onToast} />
       )}
 
       {riskData && activeTab === 'expansion' && (

@@ -329,8 +329,8 @@ Telemetry-heavy view focused on **product usage signals**:
 
 | Component | Purpose |
 |---|---|
-| `UsageMetricStrip` | 5 top-level KPIs (WAU, DAU, feature depth, API calls, sessions) |
-| `WeeklyUsageTrendChart` | Multi-series SVG sparkline — WAU vs. contracted baseline |
+| `IdleAndClusterPanel` | Idle products (core flagged, idle ARR at stake, severity) and cluster details (named clusters under 10%, plus placeholder names for the rest). Figures come from `server/data/usage_insights.json` |
+| `UsageActivationPatternChart` | Weekly active users vs contract target, plus per-product activation (purchased, activated, % used) |
 | `ProductAdoptionGrid` | Module-level adoption heatmap (which product modules are being used) |
 | `FeatureUtilizationTable` | Granular feature-by-feature usage % with trend arrows |
 | `AdoptionAnomaliesFeed` | Automated anomaly detection feed (e.g. "Analytics module dropped 40%") |
@@ -464,8 +464,8 @@ client/src/
     │
     ├── UsageAdoption/               # Product telemetry view (#usage-and-adoption)
     │   ├── UsageAdoptionView.jsx    # Layout assembler + account selector
-    │   ├── UsageMetricStrip.jsx     # Top-level usage KPI cards
-    │   ├── WeeklyUsageTrendChart.jsx # SVG multi-series trend sparkline
+    │   ├── IdleAndClusterPanel.jsx  # Idle products + cluster details
+    │   ├── UsageActivationPatternChart.jsx # Usage trend + product activation pattern
     │   ├── ProductAdoptionGrid.jsx  # Module-level heatmap grid
     │   ├── FeatureUtilizationTable.jsx # Granular feature usage % table
     │   └── AdoptionAnomaliesFeed.jsx   # Anomaly events
@@ -569,6 +569,9 @@ The initial commit (`99482e2`) shipped the original three-account mock dashboard
 - **New modal**: Seat Optimizer.
 - Existing cards, views, header, sidebar and styles were updated to read the new data shape.
 - `?account=<name>` in the URL preselects an account.
+- **Risk Profiles tab** (Risk & Signals): lists each account's RP records from its risk register, with an "Email owner" button that opens a pre-filled email to the retention owner (`RiskProfilesPanel.jsx`; `/api/risk-signals` now returns `riskProfiles`). `?tab=profiles` opens the tab directly.
+- **Account scope**: with no account selected, every page shows portfolio-wide data, and Account Overview opens the global portfolio. Choosing an account in the top-right filter limits every page, the alerts and Ask AI to that account. "All Accounts" in the filter returns to the global view.
+- Server: `/api/portfolio`, `/api/risk-signals` and `/api/notifications` accept `?account=<name>`. `/api/usage/__all__` returns portfolio-wide usage, and `/api/accounts-full` returns every account record.
 - The Vite proxy target now follows `API_PORT` (default 5001).
 
 ### Docs

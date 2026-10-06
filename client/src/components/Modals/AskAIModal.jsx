@@ -5,7 +5,7 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: `Hello! I answer from the stored assessment for ${currentAccountName || 'the selected account'} and cite the records behind each answer. Ask why it is classed the way it is, about support cases, idle products, renewal sentiment, next actions, or who to reach out to.`
+      text: `Hello! I answer from the stored assessment for ${currentAccountName || 'the whole portfolio'} and cite the records behind each answer. Ask why it is classed the way it is, about support cases, idle products, renewal sentiment, next actions, or who to reach out to.`
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +62,7 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
                 Ask Customer Intelligence AI
               </h2>
               <span className="text-[11px] text-on-surface-variant font-code-sm">
-                Context: {currentAccountName} • Answers come from the stored assessment
+                Context: {currentAccountName || 'All Accounts'} • Answers come from the stored assessment
               </span>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
           >
             <input
               type="text"
-              placeholder={`Ask about ${currentAccountName}, churn velocity, or playbooks...`}
+              placeholder={`Ask about ${currentAccountName || 'the portfolio'}, churn velocity, or playbooks...`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="flex-1 px-4 py-2 bg-[#071445] border border-[#3858a6] rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary"

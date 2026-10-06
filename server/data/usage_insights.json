@@ -1,0 +1,68 @@
+{
+  "_comment": "Per-account cluster, idle-product and idle-ARR figures supplied for the Usage & Adoption page. nearZero lists the named clusters under 10% utilization; the remaining clusters up to `total` are placeholder names generated in portfolio.js.",
+  "Apex Global Logistics": {
+    "severity": "High", "clusters": { "total": 8, "nearZero": [["agl-edge-mem", 3], ["agl-edge-hou", 6], ["agl-dev-01", 8]] },
+    "idle": [{ "name": "Cloud Data Protection Edge", "pct": 4, "core": true }, { "name": "Cloud Vault Archive", "pct": 0, "core": false }],
+    "idleArr": { "amount": 330000, "pctOfRenewalArr": 23 }
+  },
+  "AFLAC Incorporated": {
+    "severity": "Low", "clusters": { "total": 5, "nearZero": [] }, "idle": [], "idleArr": { "amount": 0, "pctOfRenewalArr": 0 }
+  },
+  "Willis Towers Watson": {
+    "severity": "Medium", "clusters": { "total": 10, "nearZero": [["will-prod-04", 3], ["will-dev-03", 8]] },
+    "idle": [{ "name": "Identity Resilience license", "pct": 0, "core": false, "note": "Bought but never activated" }],
+    "idleArr": { "amount": 120000, "pctOfRenewalArr": 6 }
+  },
+  "Keycorp": {
+    "severity": "High", "clusters": { "total": 7, "nearZero": [["keyc-site-02", 2], ["keyc-prod-06", 4]] },
+    "idle": [{ "name": "RS-BT-EE-PE-PP Cloud Data Protection", "pct": 7, "core": true }, { "name": "RS-FT-BE-NCD-PE-PP NAS Cloud Direct", "pct": 0, "core": false }],
+    "idleArr": { "amount": 260000, "pctOfRenewalArr": 15 }
+  },
+  "Autodesk, Inc.": {
+    "severity": "Medium", "clusters": { "total": 3, "nearZero": [["auto-edge-01", 7], ["auto-prod-02", 8]] },
+    "idle": [{ "name": "RS-BT-CVAZR-PE-PP Cloud Vault", "pct": 0, "core": false }, { "name": "RS-BT-CVBZR-PE-PP Cloud Vault", "pct": 0, "core": false }],
+    "idleArr": { "amount": 270000, "pctOfRenewalArr": 26 }
+  },
+  "Amgen Inc.": {
+    "severity": "High", "clusters": { "total": 7, "nearZero": [["USAM-PDPX-RBIZ", 2], ["USRI-PDPX-RBIZA", 5], ["amge-dr-03", 5], ["PRJU-PDPX-RBIZB", 9]] },
+    "idle": [{ "name": "RS-UR-RUP-PE-PP Cloud Data Protection", "pct": 9, "core": true }],
+    "idleArr": { "amount": 150000, "pctOfRenewalArr": 9 }
+  },
+  "Vodafone Ziggo": {
+    "severity": "High", "clusters": { "total": 6, "nearZero": [["voda-site-01", 1], ["nlehv1svf01-rubrik", 6]] },
+    "idle": [{ "name": "RS-BT-BE-PE-PP Cloud Data Protection", "pct": 3, "core": true }, { "name": "Identity Resilience license", "pct": 0, "core": false }],
+    "idleArr": { "amount": 190000, "pctOfRenewalArr": 17 }
+  },
+  "Lloyds Banking Group PLC": {
+    "severity": "Critical", "clusters": { "total": 4, "nearZero": [["lloy-dev-02", 1], ["lloy-edge-03", 9]] },
+    "idle": [{ "name": "RS-UR-ICR-PE-PP Cloud Data Protection", "pct": 9, "core": true }],
+    "idleArr": { "amount": 300000, "pctOfRenewalArr": 26 }
+  },
+  "CDK Global, Inc.": {
+    "severity": "Medium", "clusters": { "total": 6, "nearZero": [["cdk-dr-02", 6], ["cdk-dev-06", 8]] },
+    "idle": [{ "name": "Identity Resilience license", "pct": 0, "core": false, "note": "The Salesforce activation case is still open" }],
+    "idleArr": { "amount": 260000, "pctOfRenewalArr": 15 }
+  },
+  "CSGI": {
+    "severity": "Low", "clusters": { "total": 10, "nearZero": [["csgi-edge-04", 2], ["csgi-prod-02", 6]] }, "idle": [], "idleArr": { "amount": 0, "pctOfRenewalArr": 0 }
+  },
+  "Manufacturers and Traders Trust Company": {
+    "severity": "Medium", "clusters": { "total": 12, "nearZero": [["manu-prod-02", 5], ["manu-site-07", 6]] },
+    "idle": [{ "name": "Identity Resilience license", "pct": 0, "core": false }],
+    "idleArr": { "amount": 330000, "pctOfRenewalArr": 8 }
+  },
+  "Humana Inc.": {
+    "severity": "Low", "clusters": { "total": 12, "nearZero": [["SDC_RUBRIK03", 3], ["SDC_RUBRIK02", 9]] }, "idle": [], "idleArr": { "amount": 0, "pctOfRenewalArr": 0 }
+  },
+  "Epic Hosting LLC": {
+    "severity": "Low", "clusters": { "total": 12, "nearZero": [["rstnva01-rbk-0101", 8]] }, "idle": [], "idleArr": { "amount": 0, "pctOfRenewalArr": 0 }
+  },
+  "CooperVision": {
+    "severity": "High", "clusters": { "total": 9, "nearZero": [["rubkmgmtpr01-uscl", 3], ["rubkmgmtpr38-ilah", 4], ["rubkmgmtpr40-usgil", 5], ["coop-dr-01", 8]] },
+    "idle": [{ "name": "RS-FT-UCL-PE-PP Cloud Data Protection", "pct": 2, "core": true }],
+    "idleArr": { "amount": 220000, "pctOfRenewalArr": 10 }
+  },
+  "Tradeweb Markets LLC": {
+    "severity": "Low", "clusters": { "total": 6, "nearZero": [] }, "idle": [], "idleArr": { "amount": 0, "pctOfRenewalArr": 0 }
+  }
+}

@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { ACCOUNTS, USAGE, HUB_LIST, buildPortfolio, buildRiskSignals, buildNotifications, portfolioFacts } from './portfolio.js';
+import { ACCOUNTS, USAGE, HUB_LIST, buildPortfolio, buildRiskSignals, buildNotifications, portfolioFacts, allAccountRecords, buildUsageAggregate, usageExtras } from './portfolio.js';
 import { ASSESSMENTS, assessmentRows, answerFromAssessment, recordVerdict, verdictsFor } from './assess/store.js';
 
 const app = express();
@@ -133,6 +133,11 @@ app.get('/api/accounts', (req, res) => {
   res.json({ accounts: results });
 });
 
+// GET every full account record (used for portfolio-wide views)
+app.get('/api/accounts-full', (req, res) => {
+  res.json({ accounts: allAccountRecords() });
+});
+
 // GET single account detail
 app.get('/api/accounts/:name', (req, res) => {
   const name = decodeURIComponent(req.params.name);
@@ -153,12 +158,13 @@ app.get('/api/accounts/:name', (req, res) => {
 
 // GET portfolio overview (computed from the account dataset)
 app.get('/api/portfolio', (req, res) => {
-  res.json({ portfolio: buildPortfolio() });
+  res.json({ portfolio: buildPortfolio(req.query.account || null) });
 });
 
 // GET usage & adoption for one account
 app.get('/api/usage/:name', (req, res) => {
   const name = decodeURIComponent(req.params.name);
+  if (name === '__all__') return res.json({ usage: { ...buildUsageAggregate(), ...usageExtras(null) } });
   const accountUsage = USAGE[name] || {
     accountName: name,
     accountId: 'ACC-' + Math.floor(1000 + Math.random() * 9000),
@@ -199,17 +205,17 @@ app.get('/api/usage/:name', (req, res) => {
     ]
   };
 
-  res.json({ usage: accountUsage });
+  res.json({ usage: { ...accountUsage, ...usageExtras(ACCOUNTS[name] ? name : '__none__') } });
 });
 
 // GET header notifications across the portfolio
 app.get('/api/notifications', (req, res) => {
-  res.json(buildNotifications());
+  res.json(buildNotifications(req.query.account || null));
 });
 
 // GET risk & signals page data (computed from the account dataset)
 app.get('/api/risk-signals', (req, res) => {
-  res.json(buildRiskSignals());
+  res.json(buildRiskSignals(req.query.account || null));
 });
 
 // POST Trigger Playbook
@@ -266,6 +272,16 @@ app.post('/api/assessments/:name/feedback', (req, res) => {
 // POST Ask AI Query
 app.post('/api/ask-ai', (req, res) => {
   const { question, accountName } = req.body;
+  if (!accountName) {
+    // No account selected: answer from the portfolio-wide assessment rows
+    const rows = assessmentRows();
+    const high = rows.filter(r => r.severity === 'High');
+    const pf = portfolioFacts();
+    const answer = `Across ${pf.accountCount} accounts (${pf.totalArr} ARR), ${high.length} are rated High severity` +
+      (high.length ? ': ' + high.slice(0, 5).map(r => `${r.name} (${r.driver}, renews in ${r.days} days)`).join('; ') + '.' : '.') +
+      ` ${pf.renewalCount} have renewals inside 30 days, exposing ${pf.renewalArr}. Select an account in the top-right filter for a detailed, cited answer.`;
+    return res.json({ answer, sources: [], accountName: null, grounded: true, timestamp: new Date().toISOString() });
+  }
   const grounded = answerFromAssessment(accountName, question);
   if (grounded) return res.json({ answer: grounded.answer, sources: grounded.sources, accountName, grounded: true, timestamp: new Date().toISOString() });
   const currentAccount = ACCOUNTS[accountName] || getSynthesizedAccount(accountName || 'Apex Global Logistics');

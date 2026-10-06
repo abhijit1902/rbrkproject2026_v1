@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import UsageMetricStrip from './UsageMetricStrip';
-import WeeklyUsageTrendChart from './WeeklyUsageTrendChart';
+import IdleAndClusterPanel from './IdleAndClusterPanel';
+import UsageActivationPatternChart from './UsageActivationPatternChart';
 import ProductAdoptionGrid from './ProductAdoptionGrid';
 import FeatureUtilizationTable from './FeatureUtilizationTable';
 import AdoptionAnomaliesFeed from './AdoptionAnomaliesFeed';
@@ -23,7 +23,7 @@ export default function UsageAdoptionView({
   }, [selectedAccountName]);
 
   const fetchUsage = (accName) => {
-    fetch(`/api/usage/${encodeURIComponent(accName || 'Apex Global Logistics')}`)
+    fetch(`/api/usage/${encodeURIComponent(accName || '__all__')}`)
       .then(res => res.json())
       .then(data => setUsageData(data.usage))
       .catch(err => console.error('Error fetching usage data:', err));
@@ -59,10 +59,11 @@ export default function UsageAdoptionView({
           <div className="flex items-center gap-2">
             <span className="text-xs text-on-surface-variant font-semibold">Entity Context:</span>
             <select
-              value={selectedAccountName}
-              onChange={(e) => onSelectAccount(e.target.value)}
+              value={selectedAccountName || ''}
+              onChange={(e) => onSelectAccount(e.target.value || null)}
               className="bg-[#1b4098] border border-[#3858a6] text-xs text-white font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-primary cursor-pointer"
             >
+              <option value="" className="bg-[#12306f] text-white">All Accounts</option>
               {allAccounts.map(acc => (
                 <option key={acc.name} value={acc.name} className="bg-[#12306f] text-white">
                   {acc.name} ({acc.arr})
@@ -127,6 +128,13 @@ export default function UsageAdoptionView({
         </div>
       </section>
 
+      {/* Row 1: idle products and cluster details */}
+      <IdleAndClusterPanel
+        usage={usageData}
+        isPortfolio={!selectedAccountName}
+        onOpenSeatOptimizer={() => setIsSeatOptimizerOpen(true)}
+      />
+
       {usageData.noTelemetry ? (
         <section className="p-space-lg rounded-xl bg-[#1c3f96]/40 border border-dashed border-[#3858a6] flex items-center gap-space-md">
           <span className="material-symbols-outlined text-4xl text-on-surface-variant">cloud_off</span>
@@ -141,14 +149,8 @@ export default function UsageAdoptionView({
         </section>
       ) : (
         <>
-          {/* Row 1: KPI Metric Strip */}
-          <UsageMetricStrip
-            usage={usageData}
-            onOpenSeatOptimizer={() => setIsSeatOptimizerOpen(true)}
-          />
-
-          {/* Row 2: WAU Velocity Trend Chart */}
-          <WeeklyUsageTrendChart usage={usageData} />
+          {/* Row 2: Usage & activation pattern */}
+          <UsageActivationPatternChart usage={usageData} />
         </>
       )}
 

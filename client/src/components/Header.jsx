@@ -8,12 +8,14 @@ export default function Header({ currentView, onNavigate, onOpenAskAI, onSearchC
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // Alerts follow the account filter: one account when selected, the whole portfolio otherwise
   useEffect(() => {
-    fetch('/api/notifications')
+    const q = selectedAccountName ? '?account=' + encodeURIComponent(selectedAccountName) : '';
+    fetch('/api/notifications' + q)
       .then(res => res.json())
       .then(data => { setNotifications(data.notifications || []); setUnreadCount(data.unread || 0); })
       .catch(() => {});
-  }, []);
+  }, [selectedAccountName]);
 
   const aq = accountQuery.trim().toLowerCase();
   const matchingAccounts = allAccounts.filter(a => !aq || a.name.toLowerCase().includes(aq));
@@ -198,7 +200,7 @@ export default function Header({ currentView, onNavigate, onOpenAskAI, onSearchC
           >
             <span className="material-symbols-outlined text-[18px]">domain</span>
             <span className="hidden md:inline font-label-md text-label-md max-w-[180px] truncate">
-              {selectedAccountName || 'Select Account'}
+              {selectedAccountName || 'All Accounts'}
             </span>
             <span className="material-symbols-outlined text-[16px]">expand_more</span>
           </button>
@@ -216,6 +218,19 @@ export default function Header({ currentView, onNavigate, onOpenAskAI, onSearchC
                 className="w-full mt-1 mb-1 px-space-sm py-1.5 rounded-lg bg-[#1b4098] border border-[#3858a6] text-xs text-white placeholder-[#9db4e2] focus:outline-none focus:border-primary"
               />
               <div className="max-h-64 overflow-y-auto flex flex-col gap-0.5">
+                {!aq && (
+                  <button
+                    onClick={() => { onSelectAccount?.(null); setShowAccountMenu(false); }}
+                    className={`flex items-center justify-between gap-2 px-space-sm py-space-xs rounded text-left w-full border-0 cursor-pointer text-xs ${
+                      !selectedAccountName
+                        ? 'bg-[#2b5db3] text-white font-semibold'
+                        : 'bg-transparent text-on-surface hover:bg-surface-container-high'
+                    }`}
+                  >
+                    <span className="truncate">All Accounts</span>
+                    <span className="text-[10px] text-on-surface-variant flex-shrink-0">{allAccounts.length} accounts</span>
+                  </button>
+                )}
                 {matchingAccounts.map(acc => (
                   <button
                     key={acc.name}

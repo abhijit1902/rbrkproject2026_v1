@@ -13,7 +13,7 @@ const TEAM_ICONS = {
 };
 
 // Mounted with key={account.name} so state resets when the selected account changes
-export default function ActionCenterView({ account, onToast, onSelectAccount }) {
+export default function ActionCenterView({ account, onToast, onSelectAccount, isPortfolio }) {
   const [usage, setUsage] = useState(null);
   const [done, setDone] = useState({});
 
@@ -24,6 +24,26 @@ export default function ActionCenterView({ account, onToast, onSelectAccount }) 
       .then(data => setUsage(data.usage))
       .catch(() => setUsage(null));
   }, [account && account.name]);
+
+  if (isPortfolio) {
+    return (
+      <div className="min-h-screen bg-transparent pt-6 px-6 pb-10">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="material-symbols-outlined text-[#66cfee] text-2xl">bolt</span>
+            <h1 className="text-2xl font-bold text-white tracking-tight m-0">Action Center</h1>
+            <span className="px-2 py-0.5 bg-[#66cfee]/20 border border-[#66cfee]/40 text-[#66cfee] text-[10px] font-bold rounded-full uppercase tracking-wider ml-1">
+              All Accounts
+            </span>
+          </div>
+          <p className="text-xs text-[#9db4e2] m-0">
+            Accounts ranked by AI triage across the portfolio. Pick an account to see its action steps and download its Account 360.
+          </p>
+        </div>
+        <AITriageQueue onSelectAccount={onSelectAccount} />
+      </div>
+    );
+  }
 
   if (!account) {
     return (
@@ -66,9 +86,6 @@ export default function ActionCenterView({ account, onToast, onSelectAccount }) 
           Download Account 360
         </button>
       </div>
-
-      {/* AI triage across all accounts, built from the stored assessments */}
-      <AITriageQueue onSelectAccount={onSelectAccount} />
 
       {/* Overall summary */}
       <div className="bg-[#1c3f96]/40 border border-[#3858a6] rounded-2xl p-5 flex flex-col gap-4">
