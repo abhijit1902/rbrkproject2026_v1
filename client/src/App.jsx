@@ -8,18 +8,34 @@ import PlaybookModal from './components/Modals/PlaybookModal';
 import ExportModal from './components/Modals/ExportModal';
 import UsageAdoptionView from './components/UsageAdoption/UsageAdoptionView';
 import RiskSignalsView from './components/RiskSignals/RiskSignalsView';
+import OpportunitiesActionsView from './components/OpportunitiesActions/OpportunitiesActionsView';
+import CasesHistoryView from './components/CasesHistory/CasesHistoryView';
+import ActionCenterView from './components/ActionCenter/ActionCenterView';
+
+const KNOWN_VIEWS = ['usage-and-adoption', 'portfolio', 'detail', 'risk-signals', 'opportunities-and-actions', 'cases-and-history', 'action-center'];
+
+// Alternate URL hashes that resolve to a canonical view id
+const HASH_ALIASES = { 'risks-and-signals': 'risk-signals' };
+const resolveHash = (raw) => HASH_ALIASES[raw] || raw;
 
 export default function App() {
   const getInitialView = () => {
     if (typeof window !== 'undefined' && window.location.hash) {
-      const hash = window.location.hash.replace('#', '');
-      if (['usage-and-adoption', 'portfolio', 'detail', 'risk-signals'].includes(hash)) return hash;
+      const hash = resolveHash(window.location.hash.replace('#', ''));
+      if (KNOWN_VIEWS.includes(hash)) return hash;
     }
     return 'detail';
   };
 
   const [currentView, setCurrentView] = useState(getInitialView);
-  const [selectedAccountName, setSelectedAccountName] = useState('Apex Global Logistics');
+  // Default account can be overridden with ?account=<name> (handy for sharing a link to one account)
+  const [selectedAccountName, setSelectedAccountName] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const fromUrl = new URLSearchParams(window.location.search).get('account');
+      if (fromUrl) return fromUrl;
+    }
+    return 'AFLAC Incorporated';
+  });
   const [accountData, setAccountData] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [portfolioData, setPortfolioData] = useState(null);
@@ -36,8 +52,8 @@ export default function App() {
 
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash && ['usage-and-adoption', 'portfolio', 'detail', 'risk-signals'].includes(hash)) {
+      const hash = resolveHash(window.location.hash.replace('#', ''));
+      if (hash && KNOWN_VIEWS.includes(hash)) {
         setCurrentView(hash);
       }
     };
@@ -82,6 +98,14 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Header account selector: switch account but stay on the current page
+  const handleChangeAccount = (name) => {
+    setSelectedAccountName(name);
+  };
+
+  // Account data only counts once it matches the selected account (avoids showing the previous account's data)
+  const currentAccount = accountData && accountData.name === selectedAccountName ? accountData : null;
+
   const handleTriggerPlaybook = async () => {
     if (!accountData) return;
     setIsDispatchingPlaybook(true);
@@ -113,10 +137,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#00142c] text-[#d4e3ff] flex flex-col font-sans">
+    <div className="min-h-screen bg-transparent text-[#e9f0ff] flex flex-col font-sans">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-16 right-6 z-50 bg-[#162b46] border border-[#2DD4CF] text-on-surface px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-fadeIn text-xs font-semibold">
+        <div className="fixed top-16 right-6 z-50 bg-[#2b5db3] border border-[#66cfee] text-on-surface px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-fadeIn text-xs font-semibold">
           <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
           <span>{toastMessage}</span>
         </div>
@@ -136,6 +160,9 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenAskAI={() => setIsAskAIOpen(true)}
+        allAccounts={allAccounts}
+        selectedAccountName={selectedAccountName}
+        onSelectAccount={handleChangeAccount}
         onSearchClick={() => {
           // Open dropdown or prompt
           const account = prompt('Enter account name to search (e.g. Apex Global Logistics, CloudScale Therapeutics, Vertex FinTech Holdings):');
@@ -159,7 +186,7 @@ export default function App() {
 
       {/* Main Workspace Frame */}
       <div className="pl-64 flex-1">
-        <main className="w-full pt-16 px-space-lg bg-[#00142c] min-h-screen">
+        <main className="w-full pt-16 px-space-lg bg-transparent min-h-screen">
           {currentView === 'detail' && (
             <AccountDetailView
               account={accountData}
@@ -174,6 +201,7 @@ export default function App() {
               onOpenPlaybookModal={() => setIsPlaybookModalOpen(true)}
               onOpenRenewalPlan={() => setIsPlaybookModalOpen(true)}
               onExportReport={() => setIsExportModalOpen(true)}
+              onToast={showToast}
             />
           )}
 
@@ -181,6 +209,7 @@ export default function App() {
             <PortfolioDashboard
               portfolio={portfolioData}
               allAccounts={allAccounts}
+              selectedAccountName={selectedAccountName}
               onSelectAccount={handleSelectAccount}
               onExportPortfolio={() => setIsExportModalOpen(true)}
             />
@@ -206,12 +235,37 @@ export default function App() {
             <RiskSignalsView
               allAccounts={allAccounts}
               onSelectAccount={handleSelectAccount}
+              onToast={showToast}
             />
           )}
 
-          {currentView !== 'detail' && currentView !== 'portfolio' && currentView !== 'usage-and-adoption' && currentView !== 'risk-signals' && (
+          {currentView === 'opportunities-and-actions' && (
+            <OpportunitiesActionsView
+              key={selectedAccountName}
+              account={currentAccount}
+            />
+          )}
+
+          {currentView === 'cases-and-history' && (
+            <CasesHistoryView
+              key={selectedAccountName}
+              account={currentAccount}
+              onToast={showToast}
+            />
+          )}
+
+          {currentView === 'action-center' && (
+            <ActionCenterView
+              key={selectedAccountName}
+              account={currentAccount}
+              onToast={showToast}
+              onSelectAccount={handleSelectAccount}
+            />
+          )}
+
+          {!KNOWN_VIEWS.includes(currentView) && (
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 select-none">
-              <div className="w-16 h-16 rounded-2xl bg-[#09203b] border border-[#213551] flex items-center justify-center text-primary shadow-lg">
+              <div className="w-16 h-16 rounded-2xl bg-[#1b4098] border border-[#3858a6] flex items-center justify-center text-primary shadow-lg">
                 <span className="material-symbols-outlined text-3xl">insights</span>
               </div>
               <h2 className="text-xl font-bold text-white capitalize m-0">
@@ -229,7 +283,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setCurrentView('portfolio')}
-                  className="px-4 py-2 bg-[#162b46] text-on-surface font-semibold text-xs rounded-lg hover:bg-[#263a56] cursor-pointer border border-[#213551]"
+                  className="px-4 py-2 bg-[#2b5db3] text-on-surface font-semibold text-xs rounded-lg hover:bg-[#3a66bb] cursor-pointer border border-[#3858a6]"
                 >
                   View Accounts Portfolio
                 </button>

@@ -2,10 +2,10 @@ import React from 'react';
 
 export default function HealthDonutCard({ account }) {
   const isError = account.statusType === 'error';
-  const colors = account.healthDonutColors || ['#3ECF8E', '#F2B84B', '#F4664A', '#3ECF8E', '#F2B84B', '#2DD4CF'];
+  const colors = account.healthDonutColors || ['#3ECF8E', '#F2B84B', '#F4664A', '#3ECF8E', '#F2B84B', '#66cfee'];
 
   return (
-    <div className="flex flex-col justify-between p-space-lg rounded-xl bg-[#09203b] border border-[#213551] shadow-md hover:bg-[#162b46] transition-colors select-none">
+    <div className="flex flex-col justify-between p-space-lg rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md hover:bg-[#2b5db3] transition-colors select-none">
       <div className="flex flex-col gap-space-sm">
         {/* Card Header */}
         <div className="flex items-center justify-between">
@@ -27,7 +27,7 @@ export default function HealthDonutCard({ account }) {
           <svg className="w-44 h-44 -rotate-90 transform" viewBox="0 0 100 100">
             {/* Background circle */}
             <circle
-              className="text-[#213551]"
+              className="text-[#3858a6]"
               cx="50"
               cy="50"
               fill="none"
@@ -91,7 +91,7 @@ export default function HealthDonutCard({ account }) {
               cy="50"
               fill="none"
               r="38"
-              stroke={colors[5] || '#2DD4CF'}
+              stroke={colors[5] || '#66cfee'}
               strokeDasharray="36 203"
               strokeDashoffset="-200"
               strokeWidth="9"
@@ -121,7 +121,7 @@ export default function HealthDonutCard({ account }) {
           {(account.healthDimensions || []).map((dim, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-2 rounded bg-[#051c36] border border-[#213551]/40"
+              className="flex items-center justify-between p-2 rounded bg-[#12306f] border border-[#3858a6]/40"
             >
               <span className="flex items-center gap-1.5 text-on-surface-variant">
                 <span
@@ -139,7 +139,7 @@ export default function HealthDonutCard({ account }) {
       </div>
 
       {/* Footer */}
-      <div className="pt-space-md mt-space-md border-t border-[#213551]/40 flex items-center justify-between text-xs">
+      <div className="pt-space-md mt-space-md border-t border-[#3858a6]/40 flex items-center justify-between text-xs">
         <span className="text-on-surface-variant">Telemetry refresh: 4m ago</span>
         <button
           onClick={() => alert(`Opening Full 6-Dimension Telemetry Matrix for ${account.name}`)}

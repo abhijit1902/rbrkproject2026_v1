@@ -53,7 +53,7 @@ export default function UsageAdoptionView({
   return (
     <div className="flex flex-col w-full pb-space-2xl gap-space-lg select-none animate-fadeIn">
       {/* Top Header & Filter Bar */}
-      <section className="bg-[#051c36] px-space-lg py-space-sm rounded-xl border border-[#213551] shadow-sm flex flex-wrap items-center justify-between gap-space-md">
+      <section className="bg-[#12306f] px-space-lg py-space-sm rounded-xl border border-[#3858a6] shadow-sm flex flex-wrap items-center justify-between gap-space-md">
         <div className="flex items-center gap-space-md flex-wrap">
           {/* Account Selector Pill */}
           <div className="flex items-center gap-2">
@@ -61,10 +61,10 @@ export default function UsageAdoptionView({
             <select
               value={selectedAccountName}
               onChange={(e) => onSelectAccount(e.target.value)}
-              className="bg-[#09203b] border border-[#213551] text-xs text-white font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-primary cursor-pointer"
+              className="bg-[#1b4098] border border-[#3858a6] text-xs text-white font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-primary cursor-pointer"
             >
               {allAccounts.map(acc => (
-                <option key={acc.name} value={acc.name} className="bg-[#051c36] text-white">
+                <option key={acc.name} value={acc.name} className="bg-[#12306f] text-white">
                   {acc.name} ({acc.arr})
                 </option>
               ))}
@@ -74,7 +74,7 @@ export default function UsageAdoptionView({
           <div className="h-4 w-px bg-outline-variant"></div>
 
           {/* Timeframe Selector */}
-          <div className="flex items-center bg-[#000e23] border border-[#213551] rounded-lg p-0.5">
+          <div className="flex items-center bg-[#1c3f96]/40 border border-[#3858a6] rounded-lg p-0.5">
             {['7D', '30D', '60D', '90D', '12M'].map((tf) => (
               <button
                 key={tf}
@@ -95,16 +95,20 @@ export default function UsageAdoptionView({
         {/* Sync Status & Action */}
         <div className="flex items-center gap-space-md">
           <div className="flex items-center gap-2 font-code-sm text-xs text-on-surface-variant">
-            <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-            <span className="font-semibold text-on-surface">Telemetry Ingestion Active</span>
-            <span className="text-outline-variant">·</span>
-            <span>Live Sync 2m ago</span>
+            <span className={'w-2 h-2 rounded-full ' + (usageData.noTelemetry ? 'bg-outline' : 'bg-primary animate-ping')}></span>
+            <span className="font-semibold text-on-surface">{usageData.noTelemetry ? 'Telemetry Not Connected' : 'Telemetry Ingestion Active'}</span>
+            {!usageData.noTelemetry && (
+              <>
+                <span className="text-outline-variant">·</span>
+                <span>Live Sync 2m ago</span>
+              </>
+            )}
           </div>
 
           <button
             onClick={handleRefresh}
             type="button"
-            className="p-1.5 rounded-lg hover:bg-[#162b46] text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-transparent border border-[#213551]"
+            className="p-1.5 rounded-lg hover:bg-[#2b5db3] text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-transparent border border-[#3858a6]"
             title="Force Telemetry Sync"
           >
             <span className={`material-symbols-outlined text-[18px] ${isRefreshing ? 'animate-spin' : ''}`}>
@@ -115,7 +119,7 @@ export default function UsageAdoptionView({
           <button
             onClick={() => onNavigate('account-overview')}
             type="button"
-            className="px-3 py-1.5 rounded-lg bg-[#162b46] hover:bg-[#263a56] text-primary font-label-md text-xs font-bold transition-all border border-[#213551] flex items-center gap-1 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-[#2b5db3] hover:bg-[#3a66bb] text-primary font-label-md text-xs font-bold transition-all border border-[#3858a6] flex items-center gap-1 cursor-pointer"
           >
             <span className="material-symbols-outlined text-[16px]">hub</span>
             <span>Back to Cockpit</span>
@@ -123,14 +127,30 @@ export default function UsageAdoptionView({
         </div>
       </section>
 
-      {/* Row 1: KPI Metric Strip */}
-      <UsageMetricStrip
-        usage={usageData}
-        onOpenSeatOptimizer={() => setIsSeatOptimizerOpen(true)}
-      />
+      {usageData.noTelemetry ? (
+        <section className="p-space-lg rounded-xl bg-[#1c3f96]/40 border border-dashed border-[#3858a6] flex items-center gap-space-md">
+          <span className="material-symbols-outlined text-4xl text-on-surface-variant">cloud_off</span>
+          <div>
+            <div className="text-sm font-bold text-on-surface">Usage telemetry not connected for this account</div>
+            <p className="text-xs text-on-surface-variant m-0 mt-1 leading-relaxed">
+              Consumed units, adoption % and overage are empty in Salesforce and must come from {usageData.usageSource || 'the telemetry source'}.
+              Weekly active users, license utilization, the usage trend and feature adoption will appear here once that data is connected.
+              Entitlements are shown below.
+            </p>
+          </div>
+        </section>
+      ) : (
+        <>
+          {/* Row 1: KPI Metric Strip */}
+          <UsageMetricStrip
+            usage={usageData}
+            onOpenSeatOptimizer={() => setIsSeatOptimizerOpen(true)}
+          />
 
-      {/* Row 2: WAU Velocity Trend Chart */}
-      <WeeklyUsageTrendChart usage={usageData} />
+          {/* Row 2: WAU Velocity Trend Chart */}
+          <WeeklyUsageTrendChart usage={usageData} />
+        </>
+      )}
 
       {/* Row 3: Product Suite Adoption Grid */}
       <ProductAdoptionGrid
@@ -140,7 +160,7 @@ export default function UsageAdoptionView({
 
       {/* Row 4: 60/40 Split: Feature Matrix & Anomalies Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
-        <FeatureUtilizationTable usage={usageData} />
+        {!usageData.noTelemetry && <FeatureUtilizationTable usage={usageData} />}
         <AdoptionAnomaliesFeed
           usage={usageData}
           onTriggerInvestigation={() => alert(`Investigating Zendesk Ticket #89201 for ${usageData.accountName}. Opening Tier-3 Engineering escalation thread.`)}

@@ -13,23 +13,32 @@ const TABS = [
   { id: 'expansion', label: 'Expansion Signals', icon: 'trending_up' },
 ];
 
-export default function RiskSignalsView({ allAccounts, onSelectAccount }) {
+export default function RiskSignalsView({ allAccounts, onSelectAccount, onToast }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [riskData, setRiskData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
 
-  useEffect(() => {
+  const loadRiskData = (notify = false) => {
+    setLoading(true);
     fetch('/api/risk-signals')
       .then(res => res.json())
       .then(data => {
         setRiskData(data);
         setLoading(false);
+        if (notify) onToast?.('Risk & signals data refreshed');
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch(() => {
+        setLoading(false);
+        if (notify) onToast?.('Could not refresh risk data');
+      });
+  };
+
+  useEffect(() => { loadRiskData(); }, []);
 
   return (
-    <div className="min-h-screen bg-[#00142c] pt-6 px-6 pb-10">
+    <div className="min-h-screen bg-transparent pt-6 px-6 pb-10">
       {/* Page Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -40,43 +49,67 @@ export default function RiskSignalsView({ allAccounts, onSelectAccount }) {
               Live Feed
             </span>
           </div>
-          <p className="text-xs text-[#6b8cae] m-0">
-            Real-time churn risk signals, early warnings, escalation tracking, and expansion opportunities
+          <p className="text-xs text-[#9db4e2] m-0">
+            Churn risk, early warning signals, escalation tracking and expansion opportunities across the portfolio
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#09203b] border border-[#213551] rounded-lg text-xs text-[#6b8cae] hover:text-white hover:border-[#2DD4CF]/50 transition-all cursor-pointer"
-            onClick={() => window.location.reload()}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1b4098] border border-[#3858a6] rounded-lg text-xs text-[#9db4e2] hover:text-white hover:border-[#66cfee]/50 transition-all cursor-pointer"
+            onClick={() => loadRiskData(true)}
           >
             <span className="material-symbols-outlined text-[15px]">refresh</span>
             Refresh
           </button>
           <button
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#09203b] border border-[#213551] rounded-lg text-xs text-[#6b8cae] hover:text-white hover:border-[#2DD4CF]/50 transition-all cursor-pointer"
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-[#1b4098] border rounded-lg text-xs hover:text-white hover:border-[#66cfee]/50 transition-all cursor-pointer ${
+              showFilter || query ? 'border-[#66cfee]/50 text-[#66cfee]' : 'border-[#3858a6] text-[#9db4e2]'
+            }`}
+            onClick={() => setShowFilter(v => !v)}
           >
             <span className="material-symbols-outlined text-[15px]">filter_list</span>
-            Filter
+            Filter{query ? ' (1)' : ''}
           </button>
         </div>
       </div>
+
+      {showFilter && (
+        <div className="flex items-center gap-2 mb-4 bg-[#1b4098] border border-[#3858a6] rounded-lg px-3 py-2">
+          <span className="material-symbols-outlined text-[16px] text-[#9db4e2]">search</span>
+          <input
+            autoFocus
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Filter every tab by account, ID, CSM, signal or stage..."
+            className="flex-1 bg-transparent border-0 text-xs text-white placeholder-[#9db4e2] focus:outline-none"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery('')}
+              className="text-[11px] text-[#9db4e2] hover:text-white bg-transparent border-0 cursor-pointer"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Summary Strip */}
       <RiskSummaryStrip riskData={riskData} loading={loading} />
 
       {/* Tab Navigation */}
-      <div className="flex items-center gap-1 bg-[#000e23] border border-[#213551] rounded-xl p-1 mb-6 mt-6 w-fit">
+      <div className="flex items-center gap-1 bg-[#1c3f96]/40 border border-[#3858a6] rounded-xl p-1 mb-6 mt-6 w-fit">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer border-0 ${
               activeTab === tab.id
-                ? 'bg-[#162b46] text-[#2DD4CF] shadow-sm'
-                : 'text-[#6b8cae] hover:text-white hover:bg-[#09203b]'
+                ? 'bg-[#2b5db3] text-[#66cfee] shadow-sm'
+                : 'text-[#9db4e2] hover:text-white hover:bg-[#1b4098]'
             }`}
           >
-            <span className={`material-symbols-outlined text-[16px] ${activeTab === tab.id ? 'text-[#2DD4CF]' : ''}`}>
+            <span className={`material-symbols-outlined text-[16px] ${activeTab === tab.id ? 'text-[#66cfee]' : ''}`}>
               {tab.icon}
             </span>
             {tab.label}
@@ -85,27 +118,37 @@ export default function RiskSignalsView({ allAccounts, onSelectAccount }) {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'overview' && (
+      {!riskData && (
+        <div className="flex items-center justify-center py-16 text-[#9db4e2] text-sm">
+          {loading ? 'Loading risk and signal data...' : 'Risk and signal data is unavailable.'}
+        </div>
+      )}
+
+      {riskData && activeTab === 'overview' && (
         <div className="grid grid-cols-12 gap-5">
           <div className="col-span-8">
-            <AtRiskAccountsTable accounts={allAccounts} onSelectAccount={onSelectAccount} />
+            <AtRiskAccountsTable rows={riskData.accounts} onSelectAccount={onSelectAccount} query={query} />
           </div>
           <div className="col-span-4">
-            <ChurnProbabilityMatrix />
+            <ChurnProbabilityMatrix
+              distribution={riskData.distribution}
+              drivers={riskData.drivers}
+              total={riskData.summary.totalAccounts}
+            />
           </div>
         </div>
       )}
 
-      {activeTab === 'signals' && (
-        <SignalsFeed />
+      {riskData && activeTab === 'signals' && (
+        <SignalsFeed signals={riskData.signals} query={query} onSelectAccount={onSelectAccount} onToast={onToast} />
       )}
 
-      {activeTab === 'escalations' && (
-        <EscalationTimeline />
+      {riskData && activeTab === 'escalations' && (
+        <EscalationTimeline escalations={riskData.escalations} query={query} onToast={onToast} />
       )}
 
-      {activeTab === 'expansion' && (
-        <ExpansionOpportunities accounts={allAccounts} onSelectAccount={onSelectAccount} />
+      {riskData && activeTab === 'expansion' && (
+        <ExpansionOpportunities opportunities={riskData.expansion} onSelectAccount={onSelectAccount} query={query} />
       )}
     </div>
   );

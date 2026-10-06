@@ -6,10 +6,11 @@ import HealthDonutCard from './HealthDonutCard';
 import RenewalRiskCard from './RenewalRiskCard';
 import SignalsCard from './SignalsCard';
 import RecommendedActionsCard from './RecommendedActionsCard';
-import PeerCohortCard from './PeerCohortCard';
+import BasicAccountDetailsCard from './BasicAccountDetailsCard';
+import { ContractsCard, EngagementCard } from './ContractsEngagementCard';
 import TelemetryVelocityChart from './TelemetryVelocityChart';
-import PrescribedActionsCard from './PrescribedActionsCard';
 import ExecutiveSummaryCard from './ExecutiveSummaryCard';
+import AIAssessmentCard from './AIAssessmentCard';
 
 export default function AccountDetailView({
   account,
@@ -20,7 +21,8 @@ export default function AccountDetailView({
   isDispatchingPlaybook,
   onOpenPlaybookModal,
   onOpenRenewalPlan,
-  onExportReport
+  onExportReport,
+  onToast
 }) {
   if (!account) {
     return (
@@ -56,26 +58,30 @@ export default function AccountDetailView({
         <RenewalRiskCard account={account} onOpenRenewalPlan={onOpenRenewalPlan} />
       </section>
 
-      {/* ROW 2: SIGNALS FOR THIS ACCOUNT, RECOMMENDED ACTIONS STATS, SIMILAR ACCOUNTS */}
+      {/* ROW 2: SIGNALS FOR THIS ACCOUNT, RECOMMENDED ACTIONS STATS, BASIC ACCOUNT DETAILS */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-space-lg">
         <SignalsCard account={account} />
         <RecommendedActionsCard
           account={account}
           onOpenPlaybookModal={onOpenPlaybookModal}
         />
-        <PeerCohortCard
-          account={account}
-          onSelectAccount={onSelectAccount}
-        />
+        <BasicAccountDetailsCard account={account} />
       </section>
 
-      {/* ROW 3: 60/40 SPLIT - SIGNAL HISTORY (90-DAY) & RECOMMENDED ACTIONS LIST */}
+      {/* AI ASSESSMENT: rules + text tags, read from the stored assessment record */}
+      <AIAssessmentCard account={account} onToast={onToast} />
+
+      {/* CONTRACTS & ENGAGEMENT (shown when the account has this data) */}
+      {account.contracts && (
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-space-lg">
+          <ContractsCard contracts={account.contracts} />
+          {account.engagement && <EngagementCard engagement={account.engagement} />}
+        </section>
+      )}
+
+      {/* ROW 3: SIGNAL HISTORY (90-DAY) */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
         <TelemetryVelocityChart account={account} />
-        <PrescribedActionsCard
-          account={account}
-          onOpenPlaybookModal={onOpenPlaybookModal}
-        />
       </section>
 
       {/* ROW 4: AI GENERATED EXECUTIVE SUMMARY (FULL-WIDTH) */}

@@ -9,8 +9,6 @@ const STRIP_ITEMS = [
     bgColor: 'rgba(255,107,107,0.1)',
     borderColor: 'rgba(255,107,107,0.3)',
     suffix: 'accounts',
-    trend: '+2 this week',
-    trendUp: true,
   },
   {
     label: 'At-Risk ARR',
@@ -21,8 +19,6 @@ const STRIP_ITEMS = [
     borderColor: 'rgba(245,158,11,0.3)',
     prefix: '$',
     suffix: 'M',
-    trend: '↑ from $2.1M',
-    trendUp: true,
   },
   {
     label: 'Active Escalations',
@@ -32,20 +28,16 @@ const STRIP_ITEMS = [
     bgColor: 'rgba(167,139,250,0.1)',
     borderColor: 'rgba(167,139,250,0.3)',
     suffix: 'open',
-    trend: '3 resolved today',
-    trendUp: false,
   },
   {
     label: 'Expansion Opportunities',
     valueKey: 'expansionOpps',
     icon: 'trending_up',
-    color: '#2DD4CF',
-    bgColor: 'rgba(45,212,207,0.1)',
-    borderColor: 'rgba(45,212,207,0.3)',
+    color: '#66cfee',
+    bgColor: 'rgba(102,207,238,0.1)',
+    borderColor: 'rgba(102,207,238,0.3)',
     prefix: '$',
     suffix: 'M potential',
-    trend: '↑ Identified this quarter',
-    trendUp: false,
   },
   {
     label: 'Health Score Avg',
@@ -55,21 +47,30 @@ const STRIP_ITEMS = [
     bgColor: 'rgba(52,211,153,0.1)',
     borderColor: 'rgba(52,211,153,0.3)',
     suffix: '/ 100',
-    trend: '↑ +3 pts from last month',
-    trendUp: false,
   },
 ];
 
 const FALLBACK = {
-  criticalCount: 4,
-  atRiskArr: '3.2',
-  activeEscalations: 7,
-  expansionOpps: '8.5',
-  avgHealthScore: 64,
+  criticalCount: 0,
+  atRiskArr: '0.0',
+  activeEscalations: 0,
+  expansionOpps: '0.0',
+  avgHealthScore: 0,
+  totalAccounts: 0,
+  expansionCount: 0,
 };
+
+const captionsFor = (d) => ({
+  criticalCount: 'High-risk of ' + d.totalAccounts + ' accounts',
+  atRiskArr: 'ARR on High-risk accounts',
+  activeEscalations: 'Across ' + d.totalAccounts + ' accounts',
+  expansionOpps: d.expansionCount + ' open opportunities',
+  avgHealthScore: 'Average across ' + d.totalAccounts + ' accounts',
+});
 
 export default function RiskSummaryStrip({ riskData, loading }) {
   const data = riskData?.summary || FALLBACK;
+  const captions = captionsFor(data);
 
   return (
     <div className="grid grid-cols-5 gap-4">
@@ -112,15 +113,15 @@ export default function RiskSummaryStrip({ riskData, loading }) {
               )}
               <span className="text-3xl font-bold text-white leading-none">
                 {loading ? (
-                  <span className="inline-block w-12 h-7 bg-[#162b46] rounded animate-pulse" />
+                  <span className="inline-block w-12 h-7 bg-[#2b5db3] rounded animate-pulse" />
                 ) : val}
               </span>
               {item.suffix && !loading && (
-                <span className="text-xs text-[#6b8cae] ml-1">{item.suffix}</span>
+                <span className="text-xs text-[#9db4e2] ml-1">{item.suffix}</span>
               )}
             </div>
-            <div className="relative text-[10px] text-[#6b8cae] font-medium">
-              {item.trend}
+            <div className="relative text-[10px] text-[#9db4e2] font-medium">
+              {captions[item.valueKey]}
             </div>
           </div>
         );

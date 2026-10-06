@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { ACCOUNTS_DATA, ALL_ACCOUNTS_LIST, PORTFOLIO_DATA, USAGE_ADOPTION_DATA } from './data.js';
+import { ACCOUNTS, USAGE, HUB_LIST, buildPortfolio, buildRiskSignals, buildNotifications, portfolioFacts } from './portfolio.js';
+import { ASSESSMENTS, assessmentRows, answerFromAssessment, recordVerdict, verdictsFor } from './assess/store.js';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -100,6 +101,19 @@ function getSynthesizedAccount(accountName) {
   };
 }
 
+// Basic account details shown on the Account Detail page
+function getBasicDetails(account) {
+  return {
+    tcv: account.totalContractValue,
+    region: account.region || null,
+    customerSince: String(account.since || '').replace('Customer since ', ''),
+    parentCompany: account.parentCompany === undefined ? null : account.parentCompany,
+    ae: account.ae || null,
+    se: account.se || null,
+    renewalOwner: account.renewalOwner || null,
+  };
+}
+
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
@@ -108,10 +122,10 @@ app.get('/api/health', (req, res) => {
 // GET list of accounts with optional search filter
 app.get('/api/accounts', (req, res) => {
   const query = (req.query.search || '').toLowerCase().trim();
-  let results = ALL_ACCOUNTS_LIST;
+  let results = HUB_LIST;
   if (query) {
-    results = ALL_ACCOUNTS_LIST.filter(acc => 
-      acc.name.toLowerCase().includes(query) || 
+    results = HUB_LIST.filter(acc =>
+      acc.name.toLowerCase().includes(query) ||
       acc.arr.toLowerCase().includes(query) ||
       acc.industry.toLowerCase().includes(query)
     );
@@ -122,8 +136,9 @@ app.get('/api/accounts', (req, res) => {
 // GET single account detail
 app.get('/api/accounts/:name', (req, res) => {
   const name = decodeURIComponent(req.params.name);
-  const account = ACCOUNTS_DATA[name] || getSynthesizedAccount(name);
-  
+  const base = ACCOUNTS[name] || getSynthesizedAccount(name);
+  const account = { ...base };
+
   // Overlay runtime playbook status if active
   if (activePlaybooks.has(name)) {
     const runtime = activePlaybooks.get(name);
@@ -131,23 +146,20 @@ app.get('/api/accounts/:name', (req, res) => {
     account.playbookProgress = runtime.progress;
     account.isPlaybookDispatched = true;
   }
-  
+
+  account.basicDetails = getBasicDetails(account);
   res.json({ account });
 });
 
-// GET portfolio stats
+// GET portfolio overview (computed from the account dataset)
 app.get('/api/portfolio', (req, res) => {
-  res.json({ portfolio: PORTFOLIO_DATA });
+  res.json({ portfolio: buildPortfolio() });
 });
 
-// GET usage & adoption portfolio or account
-app.get('/api/usage', (req, res) => {
-  res.json({ usage: USAGE_ADOPTION_DATA.portfolio });
-});
-
+// GET usage & adoption for one account
 app.get('/api/usage/:name', (req, res) => {
   const name = decodeURIComponent(req.params.name);
-  const accountUsage = USAGE_ADOPTION_DATA.accounts[name] || {
+  const accountUsage = USAGE[name] || {
     accountName: name,
     accountId: 'ACC-' + Math.floor(1000 + Math.random() * 9000),
     arr: '$1.1M ARR',
@@ -190,6 +202,16 @@ app.get('/api/usage/:name', (req, res) => {
   res.json({ usage: accountUsage });
 });
 
+// GET header notifications across the portfolio
+app.get('/api/notifications', (req, res) => {
+  res.json(buildNotifications());
+});
+
+// GET risk & signals page data (computed from the account dataset)
+app.get('/api/risk-signals', (req, res) => {
+  res.json(buildRiskSignals());
+});
+
 // POST Trigger Playbook
 app.post('/api/playbook/trigger', (req, res) => {
   const { accountName } = req.body;
@@ -222,22 +244,43 @@ app.post('/api/playbook/trigger', (req, res) => {
   });
 });
 
+// AI assessments (rules + text tagger, stored per account; see server/assess)
+app.get('/api/assessments', (req, res) => {
+  res.json({ rows: assessmentRows() });
+});
+
+app.get('/api/assessments/:name', (req, res) => {
+  const a = ASSESSMENTS[req.params.name];
+  if (!a) return res.status(404).json({ error: 'No assessment for ' + req.params.name });
+  res.json({ assessment: a, verdicts: verdictsFor(req.params.name) });
+});
+
+app.post('/api/assessments/:name/feedback', (req, res) => {
+  const { target, verdict, reason } = req.body || {};
+  if (!ASSESSMENTS[req.params.name] || !['confirmed', 'false_positive', 'not_useful'].includes(verdict)) {
+    return res.status(400).json({ error: 'Unknown account or verdict' });
+  }
+  res.json({ success: true, verdicts: recordVerdict(req.params.name, target || 'call', verdict, reason) });
+});
+
 // POST Ask AI Query
 app.post('/api/ask-ai', (req, res) => {
   const { question, accountName } = req.body;
-  const currentAccount = ACCOUNTS_DATA[accountName] || getSynthesizedAccount(accountName || 'Apex Global Logistics');
+  const grounded = answerFromAssessment(accountName, question);
+  if (grounded) return res.json({ answer: grounded.answer, sources: grounded.sources, accountName, grounded: true, timestamp: new Date().toISOString() });
+  const currentAccount = ACCOUNTS[accountName] || getSynthesizedAccount(accountName || 'Apex Global Logistics');
   
   const q = (question || '').toLowerCase();
   let answer = '';
 
   if (q.includes('arr') || q.includes('revenue') || q.includes('value')) {
-    answer = `${currentAccount.name} has a Current ARR of ${currentAccount.arrExact} (${currentAccount.yoy}) with a Total 3-Year Contract Value of ${currentAccount.totalContractValue}. Total portfolio monitored ARR is $248.6M across 340 enterprise accounts.`;
+    answer = `${currentAccount.name} has a Current ARR of ${currentAccount.arrExact} (${currentAccount.yoy}) with a Total 3-Year Contract Value of ${currentAccount.totalContractValue}. Total portfolio monitored ARR is ${portfolioFacts().totalArr} across ${portfolioFacts().accountCount} enterprise accounts.`;
   } else if (q.includes('risk') || q.includes('churn') || q.includes('critical')) {
     answer = `Risk assessment for ${currentAccount.name}: Health Score is ${currentAccount.healthScore} (${currentAccount.status}). Key risk triggers include: ${currentAccount.riskTriggers.map(t => t.text).join('; ')}. Immediate executive intervention is recommended before the ${currentAccount.renewalDaysVal}-day renewal deadline.`;
   } else if (q.includes('renewal') || q.includes('days') || q.includes('expire')) {
-    answer = `Contract renewal for ${currentAccount.name} is in ${currentAccount.renewalDaysVal} days (${currentAccount.contractEnd}). Across the portfolio, $18.9M in ARR is currently in the 30-day renewal window (14 accounts).`;
+    answer = `Contract renewal for ${currentAccount.name} is in ${currentAccount.renewalDaysVal} days (${currentAccount.contractEnd}). Across the portfolio, ${portfolioFacts().renewalArr} in ARR is currently in the 30-day renewal window (${portfolioFacts().renewalCount}).`;
   } else if (q.includes('playbook') || q.includes('action') || q.includes('next')) {
-    answer = `Active Playbook: "${currentAccount.playbookTitle}". Top prescribed action item: "${currentAccount.prescribedActions[0]?.title}" assigned to ${currentAccount.prescribedActions[0]?.assignee}. AI Model Confidence: ${currentAccount.actionsConfidence}.`;
+    answer = `Active Playbook: "${currentAccount.playbookTitle}". ${currentAccount.actionsOpenCount} open prescriptions. AI Model Confidence: ${currentAccount.actionsConfidence}.`;
   } else {
     answer = `Telemetry synthesis for ${currentAccount.name}: Health score is ${currentAccount.healthScore} with ${currentAccount.activeRiskFlagsSummary}. CSM ${currentAccount.csm} is monitoring ${currentAccount.signalsSummary.total} signals. Executive summary: ${currentAccount.execSummary}`;
   }
@@ -254,25 +297,6 @@ app.post('/api/feedback', (req, res) => {
   const { accountName, type, comments } = req.body;
   userFeedback.push({ accountName, type, comments, timestamp: new Date().toISOString() });
   res.json({ success: true, count: userFeedback.length });
-});
-
-// GET risk & signals summary
-app.get('/api/risk-signals', (req, res) => {
-  res.json({
-    summary: {
-      criticalCount: 4,
-      atRiskArr: '3.2',
-      activeEscalations: 7,
-      expansionOpps: '8.5',
-      avgHealthScore: 64,
-    },
-    signals: [
-      { type: 'critical', account: 'Apex Global Logistics', message: 'Usage dropped 62% WAU', time: '8m ago' },
-      { type: 'critical', account: 'CloudScale Therapeutics', message: 'Executive sponsor departed', time: '41m ago' },
-      { type: 'warning', account: 'Vertex FinTech Holdings', message: 'P1 SLA breached', time: '1h ago' },
-    ],
-    lastUpdated: new Date().toISOString(),
-  });
 });
 
 app.listen(PORT, () => {
