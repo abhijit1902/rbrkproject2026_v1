@@ -9,9 +9,9 @@ export default function ExportModal({ isOpen, onClose, account }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-fadeIn">
-      <div className="w-full max-w-2xl bg-[#09203b] border border-[#213551] rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+      <div className="w-full max-w-2xl bg-[#1b4098] border border-[#3858a6] rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#213551] bg-[#051c36]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#3858a6] bg-[#12306f]">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-[22px]">description</span>
             <h2 className="font-headline-sm text-base text-on-surface font-bold m-0">
@@ -20,16 +20,16 @@ export default function ExportModal({ isOpen, onClose, account }) {
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-[#162b46] transition-colors cursor-pointer bg-transparent border-0"
+            className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-[#2b5db3] transition-colors cursor-pointer bg-transparent border-0"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* Document Body */}
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 text-xs text-on-surface bg-[#00142c]/60 leading-relaxed">
-          <div className="p-4 rounded-xl bg-[#051c36] border border-[#213551]">
-            <div className="flex items-center justify-between border-b border-[#213551] pb-2">
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 text-xs text-on-surface bg-[#071445]/60 leading-relaxed">
+          <div className="p-4 rounded-xl bg-[#12306f] border border-[#3858a6]">
+            <div className="flex items-center justify-between border-b border-[#3858a6] pb-2">
               <div>
                 <h3 className="text-base font-bold text-white m-0">{account.name}</h3>
                 <span className="text-[11px] text-on-surface-variant font-code-sm">
@@ -75,12 +75,12 @@ export default function ExportModal({ isOpen, onClose, account }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-[#213551] bg-[#051c36] flex items-center justify-between">
+        <div className="px-6 py-3 border-t border-[#3858a6] bg-[#12306f] flex items-center justify-between">
           <span className="text-xs text-on-surface-variant">Formatted for Board & CSM review</span>
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-3 py-1.5 bg-[#162b46] hover:bg-[#263a56] text-on-surface font-semibold rounded-lg text-xs cursor-pointer border border-[#213551]"
+              className="px-3 py-1.5 bg-[#2b5db3] hover:bg-[#3a66bb] text-on-surface font-semibold rounded-lg text-xs cursor-pointer border border-[#3858a6]"
             >
               Cancel
             </button>

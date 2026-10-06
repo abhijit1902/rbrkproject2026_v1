@@ -15,9 +15,9 @@ export default function PlaybookModal({ isOpen, onClose, account, onTriggerPlayb
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-fadeIn">
-      <div className="w-full max-w-3xl bg-[#09203b] border border-[#213551] rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+      <div className="w-full max-w-3xl bg-[#1b4098] border border-[#3858a6] rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#213551] bg-[#051c36]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#3858a6] bg-[#12306f]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
               <span className="material-symbols-outlined text-[22px]">play_circle</span>
@@ -38,14 +38,14 @@ export default function PlaybookModal({ isOpen, onClose, account, onTriggerPlayb
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-[#162b46] transition-colors cursor-pointer bg-transparent border-0"
+            className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-[#2b5db3] transition-colors cursor-pointer bg-transparent border-0"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* Status Bar */}
-        <div className="px-6 py-3 bg-[#00142c] border-b border-[#213551] flex items-center justify-between">
+        <div className="px-6 py-3 bg-[#071445] border-b border-[#3858a6] flex items-center justify-between">
           <div className="flex items-center gap-4 text-xs">
             <span className="text-on-surface-variant">
               Execution Stage: <strong className="text-primary">{account.playbookStep || 'Step 2 of 5'}</strong>
@@ -69,7 +69,7 @@ export default function PlaybookModal({ isOpen, onClose, account, onTriggerPlayb
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-[#051c36] h-1.5 overflow-hidden">
+        <div className="w-full bg-[#12306f] h-1.5 overflow-hidden">
           <div
             className="bg-primary h-full transition-all duration-500"
             style={{ width: `${account.playbookProgress || 40}%` }}
@@ -83,10 +83,10 @@ export default function PlaybookModal({ isOpen, onClose, account, onTriggerPlayb
               key={st.step}
               className={`p-4 rounded-xl border flex items-start gap-4 transition-colors ${
                 st.status === 'Completed'
-                  ? 'bg-[#051c36]/60 border-[#3ECF8E]/30'
+                  ? 'bg-[#12306f]/60 border-[#3ECF8E]/30'
                   : st.status === 'In Progress'
-                  ? 'bg-[#162b46] border-primary/50 shadow-md'
-                  : 'bg-[#000e23]/50 border-[#213551]/40 opacity-70'
+                  ? 'bg-[#2b5db3] border-primary/50 shadow-md'
+                  : 'bg-[#0b2166]/50 border-[#3858a6]/40 opacity-70'
               }`}
             >
               <div
@@ -95,7 +95,7 @@ export default function PlaybookModal({ isOpen, onClose, account, onTriggerPlayb
                     ? 'bg-[#3ECF8E]/20 text-[#3ECF8E]'
                     : st.status === 'In Progress'
                     ? 'bg-primary text-on-primary animate-pulse'
-                    : 'bg-[#213551] text-on-surface-variant'
+                    : 'bg-[#3858a6] text-on-surface-variant'
                 }`}
               >
                 {st.status === 'Completed' ? '✓' : st.step}
@@ -105,7 +105,7 @@ export default function PlaybookModal({ isOpen, onClose, account, onTriggerPlayb
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-on-surface">{st.title}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-code-sm bg-[#000e23] border border-[#213551] text-on-surface-variant font-semibold">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-code-sm bg-[#1c3f96]/40 border border-[#3858a6] text-on-surface-variant font-semibold">
                       {st.dept}
                     </span>
                   </div>
@@ -130,11 +130,11 @@ export default function PlaybookModal({ isOpen, onClose, account, onTriggerPlayb
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-[#213551] bg-[#051c36] flex items-center justify-between text-xs text-on-surface-variant">
+        <div className="px-6 py-3 border-t border-[#3858a6] bg-[#12306f] flex items-center justify-between text-xs text-on-surface-variant">
           <span>Audit Log ID: #AUD-99420-PLB</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#162b46] hover:bg-[#263a56] text-on-surface font-semibold rounded-lg transition-colors cursor-pointer border border-[#213551]"
+            className="px-4 py-1.5 bg-[#2b5db3] hover:bg-[#3a66bb] text-on-surface font-semibold rounded-lg transition-colors cursor-pointer border border-[#3858a6]"
           >
             Close
           </button>

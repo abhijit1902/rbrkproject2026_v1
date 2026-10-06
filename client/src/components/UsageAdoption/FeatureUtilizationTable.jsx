@@ -4,7 +4,7 @@ export default function FeatureUtilizationTable({ usage }) {
   const features = usage?.featuresMatrix || [];
 
   return (
-    <div className="lg:col-span-7 p-space-lg rounded-xl bg-[#09203b] border border-[#213551] shadow-md flex flex-col justify-between select-none">
+    <div className="lg:col-span-12 p-space-lg rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md flex flex-col justify-between select-none">
       <div className="flex flex-col gap-space-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-space-xs text-on-surface font-headline-sm text-base font-bold">
@@ -20,7 +20,7 @@ export default function FeatureUtilizationTable({ usage }) {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-on-surface-variant border-collapse">
             <thead>
-              <tr className="border-b border-[#213551] text-[11px] uppercase tracking-wider text-outline">
+              <tr className="border-b border-[#3858a6] text-[11px] uppercase tracking-wider text-outline">
                 <th className="py-2.5 px-3">Feature Capability</th>
                 <th className="py-2.5 px-2">Module</th>
                 <th className="py-2.5 px-2">Account %</th>
@@ -30,7 +30,7 @@ export default function FeatureUtilizationTable({ usage }) {
                 <th className="py-2.5 px-2 text-right">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#213551]/40 font-body-sm">
+            <tbody className="divide-y divide-[#3858a6]/40 font-body-sm">
               {features.map((feat, idx) => {
                 const isUnderperforming = feat.adoptionPct < feat.cohortPct - 15;
                 const isOverperforming = feat.adoptionPct > feat.cohortPct + 10;
@@ -38,7 +38,7 @@ export default function FeatureUtilizationTable({ usage }) {
                 return (
                   <tr
                     key={idx}
-                    className="hover:bg-[#051c36] transition-colors group cursor-pointer"
+                    className="hover:bg-[#12306f] transition-colors group cursor-pointer"
                   >
                     <td className="py-3 px-3 font-semibold text-white flex items-center gap-1.5">
                       {feat.isAnomaly && (
@@ -64,7 +64,7 @@ export default function FeatureUtilizationTable({ usage }) {
                         >
                           {feat.adoptionPct}%
                         </span>
-                        <div className="w-12 bg-[#00142c] h-1.5 rounded-full overflow-hidden">
+                        <div className="w-12 bg-[#071445] h-1.5 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${
                               isUnderperforming
@@ -106,7 +106,7 @@ export default function FeatureUtilizationTable({ usage }) {
         </div>
       </div>
 
-      <div className="pt-space-md mt-space-md border-t border-[#213551]/40 flex items-center justify-between text-xs">
+      <div className="pt-space-md mt-space-md border-t border-[#3858a6]/40 flex items-center justify-between text-xs">
         <span className="text-on-surface-variant">
           Correlated with daily telemetry event logs
         </span>

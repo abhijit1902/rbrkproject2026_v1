@@ -18,9 +18,9 @@ export default function ExecutiveSummaryCard({ account, onGeneratePdf }) {
 
   return (
     <section className="w-full select-none">
-      <div className="p-space-lg rounded-xl bg-[#09203b] border border-[#213551] shadow-md flex flex-col gap-space-md">
+      <div className="p-space-lg rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md flex flex-col gap-space-md">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-space-sm pb-space-sm border-b border-[#213551]/40">
+        <div className="flex flex-wrap items-center justify-between gap-space-sm pb-space-sm border-b border-[#3858a6]/40">
           <div className="flex items-center gap-space-sm">
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
               <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
@@ -36,9 +36,9 @@ export default function ExecutiveSummaryCard({ account, onGeneratePdf }) {
           </div>
 
           <div className="flex items-center gap-space-sm">
-            <span className="px-2.5 py-1 rounded-full bg-[#162b46] border border-[#213551] text-primary font-code-sm text-xs flex items-center gap-1.5 font-semibold">
+            <span className="px-2.5 py-1 rounded-full bg-[#2b5db3] border border-[#3858a6] text-primary font-code-sm text-xs flex items-center gap-1.5 font-semibold">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-              AI Synthesized · 14m ago
+              AI Synthesized · {account.generatedLabel || 'just now'}
             </span>
             <button
               onClick={() => alert(`Briefing summary shared with CSM ${account.csm} and Executive Account Pod.`)}
@@ -52,7 +52,7 @@ export default function ExecutiveSummaryCard({ account, onGeneratePdf }) {
         </div>
 
         {/* Narrative Body */}
-        <div className="p-space-md rounded-lg bg-[#051c36] border border-[#213551]/50 text-sm text-on-surface leading-relaxed">
+        <div className="p-space-md rounded-lg bg-[#12306f] border border-[#3858a6]/50 text-sm text-on-surface leading-relaxed">
           <p className="m-0">
             {account.execSummary}
           </p>
@@ -86,7 +86,7 @@ export default function ExecutiveSummaryCard({ account, onGeneratePdf }) {
               className={`font-label-md text-xs flex items-center gap-1 transition-colors px-2 py-1 rounded cursor-pointer border-0 ${
                 feedbackState === 'helpful'
                   ? 'bg-[#3ECF8E]/20 text-[#3ECF8E]'
-                  : 'bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-[#162b46]'
+                  : 'bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-[#2b5db3]'
               }`}
             >
               <span className="material-symbols-outlined text-[16px]">thumb_up</span>
@@ -99,7 +99,7 @@ export default function ExecutiveSummaryCard({ account, onGeneratePdf }) {
               className={`font-label-md text-xs flex items-center gap-1 transition-colors px-2 py-1 rounded cursor-pointer border-0 ${
                 feedbackState === 'tuning'
                   ? 'bg-error/20 text-error'
-                  : 'bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-[#162b46]'
+                  : 'bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-[#2b5db3]'
               }`}
             >
               <span className="material-symbols-outlined text-[16px]">thumb_down</span>

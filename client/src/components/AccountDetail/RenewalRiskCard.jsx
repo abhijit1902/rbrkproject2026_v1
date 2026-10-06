@@ -4,7 +4,7 @@ export default function RenewalRiskCard({ account, onOpenRenewalPlan }) {
   const isError = account.statusType === 'error';
 
   return (
-    <div className="flex flex-col justify-between p-space-lg rounded-xl bg-[#09203b] border border-[#213551] shadow-md hover:bg-[#162b46] transition-colors select-none">
+    <div className="flex flex-col justify-between p-space-lg rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md hover:bg-[#2b5db3] transition-colors select-none">
       <div className="flex flex-col gap-space-md">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -31,7 +31,7 @@ export default function RenewalRiskCard({ account, onOpenRenewalPlan }) {
         </div>
 
         {/* Big Highlight Counter */}
-        <div className="p-space-md rounded-lg bg-[#051c36] border border-[#213551]/60 flex items-center justify-between">
+        <div className="p-space-md rounded-lg bg-[#12306f] border border-[#3858a6]/60 flex items-center justify-between">
           <div className="flex flex-col">
             <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">
               Time to Expiration
@@ -77,7 +77,7 @@ export default function RenewalRiskCard({ account, onOpenRenewalPlan }) {
             {(account.riskTriggers || []).map((t, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-space-sm p-2 rounded bg-[#051c36] hover:bg-[#213551] transition-colors border border-[#213551]/30"
+                className="flex items-center gap-space-sm p-2 rounded bg-[#12306f] hover:bg-[#3858a6] transition-colors border border-[#3858a6]/30"
               >
                 <span
                   className="w-2 h-2 rounded-full shrink-0"
@@ -91,11 +91,11 @@ export default function RenewalRiskCard({ account, onOpenRenewalPlan }) {
       </div>
 
       {/* Action Button */}
-      <div className="pt-space-md mt-space-md border-t border-[#213551]/40">
+      <div className="pt-space-md mt-space-md border-t border-[#3858a6]/40">
         <button
           onClick={onOpenRenewalPlan}
           type="button"
-          className="w-full py-2 px-space-md rounded-lg bg-[#213551] hover:bg-primary hover:text-on-primary text-primary font-label-md text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer border-0"
+          className="w-full py-2 px-space-md rounded-lg bg-[#3858a6] hover:bg-primary hover:text-on-primary text-primary font-label-md text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer border-0"
         >
           <span>View Renewal Plan</span>
           <span className="material-symbols-outlined text-[16px]">arrow_forward</span>

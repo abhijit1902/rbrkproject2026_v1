@@ -8,7 +8,7 @@ export default function UsageMetricStrip({ usage, onOpenSeatOptimizer }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-space-md select-none">
       {/* Metric 1: WAU */}
-      <div className="p-space-md rounded-xl bg-[#09203b] border border-[#213551] shadow-md flex items-center justify-between">
+      <div className="p-space-md rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md flex items-center justify-between">
         <div>
           <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">
             Weekly Active Users
@@ -37,7 +37,7 @@ export default function UsageMetricStrip({ usage, onOpenSeatOptimizer }) {
       </div>
 
       {/* Metric 2: License Utilization */}
-      <div className="p-space-md rounded-xl bg-[#09203b] border border-[#213551] shadow-md flex items-center justify-between">
+      <div className="p-space-md rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md flex items-center justify-between">
         <div>
           <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">
             License Saturation
@@ -55,7 +55,7 @@ export default function UsageMetricStrip({ usage, onOpenSeatOptimizer }) {
       </div>
 
       {/* Metric 3: Stickiness (DAU/MAU) */}
-      <div className="p-space-md rounded-xl bg-[#09203b] border border-[#213551] shadow-md flex items-center justify-between">
+      <div className="p-space-md rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md flex items-center justify-between">
         <div>
           <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">
             Stickiness (DAU / MAU)
@@ -65,7 +65,7 @@ export default function UsageMetricStrip({ usage, onOpenSeatOptimizer }) {
           </div>
           <span
             className={`font-code-sm text-xs font-bold mt-0.5 block ${
-              usage.stickinessStatus === 'At Risk' ? 'text-error' : 'text-[#F2B84B]'
+              usage.stickinessStatus === 'At Risk' ? 'text-error' : usage.stickinessStatus === 'Healthy' ? 'text-[#3ECF8E]' : 'text-[#F2B84B]'
             }`}
           >
             {usage.stickinessStatus} Baseline
@@ -77,7 +77,7 @@ export default function UsageMetricStrip({ usage, onOpenSeatOptimizer }) {
       </div>
 
       {/* Metric 4: Feature Depth Score */}
-      <div className="p-space-md rounded-xl bg-[#09203b] border border-[#213551] shadow-md flex items-center justify-between">
+      <div className="p-space-md rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md flex items-center justify-between">
         <div>
           <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">
             Feature Depth Score
@@ -95,7 +95,7 @@ export default function UsageMetricStrip({ usage, onOpenSeatOptimizer }) {
       </div>
 
       {/* Metric 5: Dormant ARR Exposure */}
-      <div className="p-space-md rounded-xl bg-[#09203b] border border-[#213551] shadow-md flex items-center justify-between">
+      <div className="p-space-md rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md flex items-center justify-between">
         <div>
           <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">
             Dormant ARR Capital

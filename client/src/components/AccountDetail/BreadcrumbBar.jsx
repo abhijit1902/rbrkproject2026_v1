@@ -37,7 +37,7 @@ export default function BreadcrumbBar({
         <button
           onClick={onGoToPortfolio}
           type="button"
-          className="text-[#2DD4CF] hover:text-[#5ce4e0] cursor-pointer flex items-center gap-1.5 font-semibold transition-colors px-2 py-1 rounded hover:bg-surface-container-high bg-transparent border-0"
+          className="text-[#66cfee] hover:text-[#8fe0f5] cursor-pointer flex items-center gap-1.5 font-semibold transition-colors px-2 py-1 rounded hover:bg-surface-container-high bg-transparent border-0"
         >
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           <span>All Accounts</span>
@@ -50,7 +50,7 @@ export default function BreadcrumbBar({
           <button
             onClick={() => setIsOpen(!isOpen)}
             type="button"
-            className="text-on-surface font-semibold hover:text-[#2DD4CF] hover:bg-surface-container-high transition-colors flex items-center gap-1 px-2.5 py-1 rounded-md cursor-pointer border border-transparent hover:border-surface-variant bg-transparent"
+            className="text-on-surface font-semibold hover:text-[#66cfee] hover:bg-surface-container-high transition-colors flex items-center gap-1 px-2.5 py-1 rounded-md cursor-pointer border border-transparent hover:border-surface-variant bg-transparent"
           >
             <span>{account.name}</span>
             <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
@@ -60,7 +60,7 @@ export default function BreadcrumbBar({
 
           {/* Dropdown Menu */}
           {isOpen && (
-            <div className="absolute left-0 top-full mt-2 w-80 bg-[#12294B] border border-surface-variant rounded-xl p-3 shadow-2xl z-50 flex flex-col gap-2">
+            <div className="absolute left-0 top-full mt-2 w-80 bg-[#1a3a85] border border-surface-variant rounded-xl p-3 shadow-2xl z-50 flex flex-col gap-2">
               {/* Search Box */}
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined text-[18px] text-outline absolute left-2.5 pointer-events-none text-on-surface-variant">
@@ -71,7 +71,7 @@ export default function BreadcrumbBar({
                   placeholder="Search 340 accounts..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 bg-[#000e23] border border-surface-variant rounded-lg text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-[#2DD4CF]"
+                  className="w-full pl-8 pr-3 py-1.5 bg-[#1c3f96]/40 border border-surface-variant rounded-lg text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-[#66cfee]"
                   autoFocus
                 />
               </div>
@@ -83,7 +83,7 @@ export default function BreadcrumbBar({
                   setIsOpen(false);
                   onGoToPortfolio();
                 }}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#051c36] hover:bg-[#162b46] text-[#2DD4CF] font-label-md text-label-md transition-colors text-left border border-[#2DD4CF]/20 cursor-pointer"
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#12306f] hover:bg-[#2b5db3] text-[#66cfee] font-label-md text-label-md transition-colors text-left border border-[#66cfee]/20 cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px]">domain</span>
@@ -117,8 +117,8 @@ export default function BreadcrumbBar({
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors cursor-pointer border-0 ${
                           isSelected
-                            ? 'bg-[#162b46] border border-primary/40 text-on-surface'
-                            : 'bg-transparent hover:bg-[#051c36] text-on-surface'
+                            ? 'bg-[#2b5db3] border border-primary/40 text-on-surface'
+                            : 'bg-transparent hover:bg-[#12306f] text-on-surface'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
@@ -155,7 +155,7 @@ export default function BreadcrumbBar({
         <span className="text-outline-variant font-light">/</span>
 
         {/* Account ID Badge */}
-        <span className="text-on-surface-variant font-code-sm text-xs px-2.5 py-0.5 rounded bg-[#000e23] border border-[#213551]">
+        <span className="text-on-surface-variant font-code-sm text-xs px-2.5 py-0.5 rounded bg-[#1c3f96]/40 border border-[#3858a6]">
           ID: {account.id}
         </span>
       </div>
@@ -165,7 +165,7 @@ export default function BreadcrumbBar({
         <button
           onClick={onExportReport}
           type="button"
-          className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-[#162b46] hover:bg-[#263a56] text-on-surface font-label-md text-xs font-medium transition-all shadow-sm cursor-pointer border border-[#213551]"
+          className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-[#2b5db3] hover:bg-[#3a66bb] text-on-surface font-label-md text-xs font-medium transition-all shadow-sm cursor-pointer border border-[#3858a6]"
         >
           <span className="material-symbols-outlined text-[16px] text-primary">download</span>
           <span>Export Account Report</span>
@@ -174,7 +174,7 @@ export default function BreadcrumbBar({
         <button
           onClick={() => alert(`Scheduled Executive Review for ${account.name} with CSM ${account.csm} on calendar.`)}
           type="button"
-          className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-[#162b46] hover:bg-[#263a56] text-on-surface font-label-md text-xs font-medium transition-all shadow-sm cursor-pointer border border-[#213551]"
+          className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-[#2b5db3] hover:bg-[#3a66bb] text-on-surface font-label-md text-xs font-medium transition-all shadow-sm cursor-pointer border border-[#3858a6]"
         >
           <span className="material-symbols-outlined text-[16px] text-secondary">calendar_today</span>
           <span>Schedule Review</span>

@@ -1,91 +1,5 @@
 import React, { useState } from 'react';
 
-const AT_RISK_ACCOUNTS = [
-  {
-    name: 'Apex Global Logistics',
-    id: 'AGL-9942',
-    tier: 'TIER 1',
-    arr: '$1.8M',
-    healthScore: 32,
-    riskLevel: 'Critical',
-    riskColor: '#ff6b6b',
-    signals: ['NPS drop -28pts', 'Usage –62%', 'Support spike'],
-    csm: 'Sarah Chen',
-    renewalDays: 47,
-    churnProb: 84,
-    playbookActive: true,
-  },
-  {
-    name: 'CloudScale Therapeutics',
-    id: 'CST-4471',
-    tier: 'TIER 1',
-    arr: '$2.4M',
-    healthScore: 41,
-    riskLevel: 'High',
-    riskColor: '#f59e0b',
-    signals: ['Executive sponsor departed', 'Feature adoption –40%'],
-    csm: 'Michael Torres',
-    renewalDays: 92,
-    churnProb: 67,
-    playbookActive: false,
-  },
-  {
-    name: 'Vertex FinTech Holdings',
-    id: 'VFH-3310',
-    tier: 'TIER 2',
-    arr: '$980K',
-    healthScore: 48,
-    riskLevel: 'High',
-    riskColor: '#f59e0b',
-    signals: ['Competitor evaluation', '3 open P1 tickets'],
-    csm: 'Rachel Kim',
-    renewalDays: 134,
-    churnProb: 59,
-    playbookActive: false,
-  },
-  {
-    name: 'DataStream Analytics',
-    id: 'DSA-7823',
-    tier: 'TIER 2',
-    arr: '$620K',
-    healthScore: 53,
-    riskLevel: 'Medium',
-    riskColor: '#f59e0b',
-    signals: ['Billing dispute open', 'API usage flat'],
-    csm: 'James Park',
-    renewalDays: 210,
-    churnProb: 44,
-    playbookActive: false,
-  },
-  {
-    name: 'Meridian Aerospace',
-    id: 'MAE-5541',
-    tier: 'TIER 3',
-    arr: '$340K',
-    healthScore: 61,
-    riskLevel: 'Watch',
-    riskColor: '#a78bfa',
-    signals: ['Low engagement last 30d', 'Champion on leave'],
-    csm: 'Lisa Wang',
-    renewalDays: 180,
-    churnProb: 31,
-    playbookActive: false,
-  },
-  {
-    name: 'NovaTech Robotics',
-    id: 'NTR-2209',
-    tier: 'TIER 2',
-    arr: '$720K',
-    healthScore: 57,
-    riskLevel: 'Medium',
-    riskColor: '#f59e0b',
-    signals: ['QBR missed x2', 'Renewal upsell stalled'],
-    csm: 'Alex Johnson',
-    renewalDays: 68,
-    churnProb: 52,
-    playbookActive: true,
-  },
-];
 
 const RISK_BADGE = {
   Critical: 'bg-[#ff6b6b]/15 text-[#ff6b6b] border border-[#ff6b6b]/30',
@@ -97,7 +11,7 @@ const RISK_BADGE = {
 function HealthBar({ score, color }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 h-1.5 bg-[#213551] rounded-full overflow-hidden">
+      <div className="w-20 h-1.5 bg-[#3858a6] rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${score}%`, background: color }}
@@ -110,7 +24,8 @@ function HealthBar({ score, color }) {
   );
 }
 
-export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
+export default function AtRiskAccountsTable({ rows = [], onSelectAccount, query = '' }) {
+  const AT_RISK_ACCOUNTS = rows;
   const [sortCol, setSortCol] = useState('churnProb');
   const [sortDir, setSortDir] = useState('desc');
 
@@ -119,7 +34,12 @@ export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
     else { setSortCol(col); setSortDir('desc'); }
   };
 
-  const sorted = [...AT_RISK_ACCOUNTS].sort((a, b) => {
+  const q = query.trim().toLowerCase();
+  const visible = AT_RISK_ACCOUNTS.filter(a =>
+    !q || [a.name, a.id, a.csm, a.riskLevel, ...(a.signals || [])].some(f => String(f).toLowerCase().includes(q))
+  );
+
+  const sorted = [...visible].sort((a, b) => {
     const av = a[sortCol];
     const bv = b[sortCol];
     if (typeof av === 'number' && typeof bv === 'number') {
@@ -129,30 +49,30 @@ export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
   });
 
   const SortIcon = ({ col }) => (
-    <span className={`material-symbols-outlined text-[13px] ml-0.5 ${sortCol === col ? 'text-[#2DD4CF]' : 'text-[#213551]'}`}>
+    <span className={`material-symbols-outlined text-[13px] ml-0.5 ${sortCol === col ? 'text-[#66cfee]' : 'text-[#3858a6]'}`}>
       {sortCol === col && sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
     </span>
   );
 
   return (
-    <div className="bg-[#000e23] border border-[#213551] rounded-2xl overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#213551]">
+    <div className="bg-[#1c3f96]/40 border border-[#3858a6] rounded-2xl overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#3858a6]">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[#ff6b6b] text-xl">warning</span>
           <h2 className="text-sm font-bold text-white m-0">At-Risk Accounts</h2>
           <span className="ml-1 px-2 py-0.5 bg-[#ff6b6b]/15 border border-[#ff6b6b]/30 text-[#ff6b6b] text-[10px] font-bold rounded-full">
-            {AT_RISK_ACCOUNTS.length}
+            {visible.length}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-[#6b8cae]">Sorted by churn probability</span>
+          <span className="text-[10px] text-[#9db4e2]">Sorted by churn probability</span>
         </div>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-[#213551]">
+            <tr className="border-b border-[#3858a6]">
               {[
                 { col: 'name', label: 'Account' },
                 { col: 'riskLevel', label: 'Risk' },
@@ -165,7 +85,7 @@ export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
                 <th
                   key={label}
                   onClick={col ? () => handleSort(col) : undefined}
-                  className={`px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-[#6b8cae] whitespace-nowrap ${col ? 'cursor-pointer hover:text-white select-none' : ''}`}
+                  className={`px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-[#9db4e2] whitespace-nowrap ${col ? 'cursor-pointer hover:text-white select-none' : ''}`}
                 >
                   {label}
                   {col && <SortIcon col={col} />}
@@ -177,13 +97,13 @@ export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
             {sorted.map((acct, i) => (
               <tr
                 key={acct.id}
-                className="border-b border-[#213551]/50 hover:bg-[#09203b] transition-colors group"
+                className="border-b border-[#3858a6]/50 hover:bg-[#1b4098] transition-colors group"
               >
                 <td className="px-4 py-3">
-                  <div className="font-semibold text-white group-hover:text-[#2DD4CF] transition-colors">
+                  <div className="font-semibold text-white group-hover:text-[#66cfee] transition-colors">
                     {acct.name}
                   </div>
-                  <div className="text-[10px] text-[#6b8cae] mt-0.5">
+                  <div className="text-[10px] text-[#9db4e2] mt-0.5">
                     {acct.id} · {acct.tier} · {acct.arr}
                   </div>
                 </td>
@@ -209,7 +129,7 @@ export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className={`font-semibold ${acct.renewalDays < 90 ? 'text-[#ff6b6b]' : 'text-[#6b8cae]'}`}>
+                  <div className={`font-semibold ${acct.renewalDays < 90 ? 'text-[#ff6b6b]' : 'text-[#9db4e2]'}`}>
                     {acct.renewalDays}d
                   </div>
                 </td>
@@ -218,7 +138,7 @@ export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
                     {acct.signals.map((s, si) => (
                       <span
                         key={si}
-                        className="px-1.5 py-0.5 bg-[#162b46] border border-[#213551] text-[#6b8cae] text-[10px] rounded"
+                        className="px-1.5 py-0.5 bg-[#2b5db3] border border-[#3858a6] text-[#9db4e2] text-[10px] rounded"
                       >
                         {s}
                       </span>
@@ -229,7 +149,7 @@ export default function AtRiskAccountsTable({ accounts, onSelectAccount }) {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => onSelectAccount(acct.name)}
-                      className="px-2.5 py-1 bg-[#162b46] border border-[#2DD4CF]/30 text-[#2DD4CF] text-[10px] font-semibold rounded-lg hover:bg-[#2DD4CF]/10 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 bg-[#2b5db3] border border-[#66cfee]/30 text-[#66cfee] text-[10px] font-semibold rounded-lg hover:bg-[#66cfee]/10 transition-colors cursor-pointer"
                     >
                       View
                     </button>

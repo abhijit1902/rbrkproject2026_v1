@@ -5,7 +5,7 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: `Hello! I am your Customer Intelligence AI assistant. I have live telemetry access to ${currentAccountName || 'Apex Global Logistics'} and the entire 340-account enterprise portfolio. How can I assist you with retention, telemetry anomalies, or playbooks today?`
+      text: `Hello! I answer from the stored assessment for ${currentAccountName || 'the selected account'} and cite the records behind each answer. Ask why it is classed the way it is, about support cases, idle products, renewal sentiment, next actions, or who to reach out to.`
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,10 +13,12 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
   if (!isOpen) return null;
 
   const quickPrompts = [
-    `What are the critical churn risks for ${currentAccountName}?`,
-    `Explain the renewal window and ARR exposure.`,
-    `What is the status of active playbooks?`,
-    `Summarize portfolio health across 340 accounts.`
+    'Why is this account classed the way it is?',
+    'What is going wrong in support cases?',
+    'Which products are idle or strong?',
+    'What is the renewal sentiment?',
+    'What actions should we take?',
+    'Who should I reach out to?'
   ];
 
   const handleSend = async (textToSend) => {
@@ -35,7 +37,7 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
         body: JSON.stringify({ question: prompt, accountName: currentAccountName })
       });
       const data = await res.json();
-      setMessages([...newMessages, { role: 'assistant', text: data.answer }]);
+      setMessages([...newMessages, { role: 'assistant', text: data.answer, sources: data.grounded ? data.sources : null }]);
     } catch (e) {
       setMessages([
         ...newMessages,
@@ -48,9 +50,9 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn select-none">
-      <div className="w-full max-w-2xl bg-[#09203b] border border-[#213551] rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+      <div className="w-full max-w-2xl bg-[#1b4098] border border-[#3858a6] rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#213551] bg-[#051c36]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#3858a6] bg-[#12306f]">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
               <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
@@ -60,25 +62,25 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
                 Ask Customer Intelligence AI
               </h2>
               <span className="text-[11px] text-on-surface-variant font-code-sm">
-                Context: {currentAccountName} • Gemini & Telemetry Correlator Active
+                Context: {currentAccountName} • Answers come from the stored assessment
               </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-[#162b46] transition-colors cursor-pointer bg-transparent border-0"
+            className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-[#2b5db3] transition-colors cursor-pointer bg-transparent border-0"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* Quick Prompts */}
-        <div className="flex flex-wrap gap-1.5 px-6 py-2.5 bg-[#00142c]/50 border-b border-[#213551]/60">
+        <div className="flex flex-wrap gap-1.5 px-6 py-2.5 bg-[#071445]/50 border-b border-[#3858a6]/60">
           {quickPrompts.map((p, idx) => (
             <button
               key={idx}
               onClick={() => handleSend(p)}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-[#162b46] hover:bg-primary hover:text-on-primary text-primary font-medium transition-colors cursor-pointer border border-[#213551]"
+              className="text-[11px] px-2.5 py-1 rounded-full bg-[#2b5db3] hover:bg-primary hover:text-on-primary text-primary font-medium transition-colors cursor-pointer border border-[#3858a6]"
             >
               {p}
             </button>
@@ -101,10 +103,13 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
                 className={`p-3.5 rounded-xl max-w-[80%] leading-relaxed ${
                   m.role === 'user'
                     ? 'bg-primary text-on-primary font-medium rounded-tr-xs'
-                    : 'bg-[#051c36] border border-[#213551] text-on-surface rounded-tl-xs shadow-md'
+                    : 'bg-[#12306f] border border-[#3858a6] text-on-surface rounded-tl-xs shadow-md'
                 }`}
               >
-                {m.text}
+                <div className="whitespace-pre-line">{m.text}</div>
+                {m.sources && m.sources.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-[#3858a6] text-[10px] text-[#9db4e2]">Sources: {m.sources.join(', ')}</div>
+                )}
               </div>
             </div>
           ))}
@@ -118,7 +123,7 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
         </div>
 
         {/* Input Bar */}
-        <div className="p-4 border-t border-[#213551] bg-[#051c36]">
+        <div className="p-4 border-t border-[#3858a6] bg-[#12306f]">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -131,7 +136,7 @@ export default function AskAIModal({ isOpen, onClose, currentAccountName }) {
               placeholder={`Ask about ${currentAccountName}, churn velocity, or playbooks...`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 px-4 py-2 bg-[#00142c] border border-[#213551] rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary"
+              className="flex-1 px-4 py-2 bg-[#071445] border border-[#3858a6] rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary"
               autoFocus
             />
             <button

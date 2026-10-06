@@ -4,7 +4,7 @@ export default function AccountSnapshotCard({ account }) {
   const isError = account.statusType === 'error';
 
   return (
-    <div className="flex flex-col justify-between p-space-lg rounded-xl bg-[#09203b] border border-[#213551] shadow-md hover:bg-[#162b46] transition-colors select-none">
+    <div className="flex flex-col justify-between p-space-lg rounded-xl bg-[#1b4098] border border-[#3858a6] shadow-md hover:bg-[#2b5db3] transition-colors select-none">
       <div className="flex flex-col gap-space-md">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -19,15 +19,19 @@ export default function AccountSnapshotCard({ account }) {
 
         {/* 2-Col Metric Tiles */}
         <div className="grid grid-cols-2 gap-space-md">
-          <div className="p-space-sm rounded-lg bg-[#051c36] border border-[#213551]/60 flex flex-col">
+          <div className="p-space-sm rounded-lg bg-[#12306f] border border-[#3858a6]/60 flex flex-col">
             <span className="font-label-sm text-[11px] text-on-surface-variant font-medium">Annual Recurring Rev</span>
             <span className="font-headline-md text-xl text-on-surface font-bold mt-1">{account.arr}</span>
             <span className="font-code-sm text-xs text-primary flex items-center gap-0.5 mt-0.5 font-semibold">
-              <span className="material-symbols-outlined text-[14px]">arrow_upward</span> {account.yoy}
+              {account.yoy ? (
+                <><span className="material-symbols-outlined text-[14px]">arrow_upward</span> {account.yoy}</>
+              ) : (
+                <span className="text-on-surface-variant font-normal">YoY not available</span>
+              )}
             </span>
           </div>
 
-          <div className="p-space-sm rounded-lg bg-[#051c36] border border-[#213551]/60 flex flex-col">
+          <div className="p-space-sm rounded-lg bg-[#12306f] border border-[#3858a6]/60 flex flex-col">
             <span className="font-label-sm text-[11px] text-on-surface-variant font-medium">Renewal Window</span>
             <span className={`font-headline-md text-xl font-bold mt-1 ${isError ? 'text-error' : 'text-[#F2B84B]'}`}>
               {account.renewalDaysVal} Days
@@ -41,12 +45,12 @@ export default function AccountSnapshotCard({ account }) {
 
         {/* Breakdown Rows */}
         <div className="flex flex-col gap-space-xs text-xs text-on-surface-variant pt-space-xs">
-          <div className="flex items-center justify-between py-1.5 border-b border-[#213551]/40">
+          <div className="flex items-center justify-between py-1.5 border-b border-[#3858a6]/40">
             <span>Contract Total Value</span>
             <span className="text-on-surface font-semibold">{account.totalContractValue}</span>
           </div>
 
-          <div className="flex items-center justify-between py-1.5 border-b border-[#213551]/40">
+          <div className="flex items-center justify-between py-1.5 border-b border-[#3858a6]/40">
             <span>Active Risk Flags</span>
             <span className={`font-semibold flex items-center gap-1.5 ${isError ? 'text-error' : 'text-[#F2B84B]'}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isError ? 'bg-error' : 'bg-[#F2B84B]'}`}></span>
@@ -54,7 +58,7 @@ export default function AccountSnapshotCard({ account }) {
             </span>
           </div>
 
-          <div className="flex items-center justify-between py-1.5 border-b border-[#213551]/40">
+          <div className="flex items-center justify-between py-1.5 border-b border-[#3858a6]/40">
             <span>Products Owned</span>
             <div className="flex items-center gap-2">
               <span className="text-on-surface font-medium">{account.productsRatio}</span>
@@ -82,7 +86,7 @@ export default function AccountSnapshotCard({ account }) {
       </div>
 
       {/* Footer */}
-      <div className="pt-space-md mt-space-md border-t border-[#213551]/40 flex items-center justify-between">
+      <div className="pt-space-md mt-space-md border-t border-[#3858a6]/40 flex items-center justify-between">
         <button
           onClick={() => alert(`Showing master contract details for ${account.name} (SFDC Contract #CNT-89104)`)}
           type="button"

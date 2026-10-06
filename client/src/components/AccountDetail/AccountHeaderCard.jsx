@@ -4,10 +4,10 @@ export default function AccountHeaderCard({ account }) {
   const isError = account.statusType === 'error';
 
   return (
-    <div className="p-space-lg rounded-xl bg-[#051c36] border border-[#213551] shadow-md flex flex-col md:flex-row md:items-center justify-between gap-space-md select-none">
+    <div className="p-space-lg rounded-xl bg-[#12306f] border border-[#3858a6] shadow-md flex flex-col md:flex-row md:items-center justify-between gap-space-md select-none">
       <div className="flex flex-col gap-space-xs">
         <div className="flex flex-wrap items-center gap-space-sm">
-          <div className="w-10 h-10 rounded-lg bg-[#213551] flex items-center justify-center text-primary shadow-inner">
+          <div className="w-10 h-10 rounded-lg bg-[#3858a6] flex items-center justify-center text-primary shadow-inner">
             <span className="material-symbols-outlined text-[24px]">corporate_fare</span>
           </div>
 
@@ -32,7 +32,7 @@ export default function AccountHeaderCard({ account }) {
           </span>
 
           {/* Tier Badge */}
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#213551] text-on-surface-variant font-code-sm text-xs font-semibold">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#3858a6] text-on-surface-variant font-code-sm text-xs font-semibold">
             {account.tier}
           </span>
         </div>
@@ -48,7 +48,7 @@ export default function AccountHeaderCard({ account }) {
 
           <span className="flex items-center gap-1">
             <span className="material-symbols-outlined text-[15px] text-outline">public</span>
-            <span>{account.region}</span>
+            <span>{account.region || (account.territory ? 'Territory ' + account.territory : 'Region not set')}</span>
           </span>
 
           <span className="text-outline-variant">•</span>
@@ -76,7 +76,7 @@ export default function AccountHeaderCard({ account }) {
       </div>
 
       {/* Quick Header Metric Callout */}
-      <div className="flex items-center gap-space-lg bg-[#000e23]/70 px-space-lg py-space-sm rounded-lg self-start md:self-auto border border-[#213551]/60">
+      <div className="flex items-center gap-space-lg bg-[#0b2166]/70 px-space-lg py-space-sm rounded-lg self-start md:self-auto border border-[#3858a6]/60">
         <div className="flex flex-col">
           <span className="font-label-sm text-[11px] text-on-surface-variant uppercase font-semibold">Current ARR</span>
           <span className="font-headline-md text-xl text-on-surface font-bold mt-0.5">
