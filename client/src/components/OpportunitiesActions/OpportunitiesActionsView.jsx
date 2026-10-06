@@ -12,7 +12,7 @@ const TABS = [
 ];
 
 // Mounted with key={account.name} so state resets when the selected account changes
-export default function OpportunitiesActionsView({ account }) {
+export default function OpportunitiesActionsView({ account, isPortfolio }) {
   const [activeTab, setActiveTab] = useState('ops');
   const [query, setQuery] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -40,7 +40,7 @@ export default function OpportunitiesActionsView({ account }) {
             </span>
           </div>
           <p className="text-xs text-[#9db4e2] m-0">
-            Open and closed opportunities, expansion, upcoming renewal, renewal sentiment and churn history for the selected account
+            {isPortfolio ? 'Open and closed opportunities, expansion, renewals and churn history across all accounts' : 'Open and closed opportunities, expansion, upcoming renewal, renewal sentiment and churn history for the selected account'}
           </p>
         </div>
         <button

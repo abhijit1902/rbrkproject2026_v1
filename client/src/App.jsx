@@ -11,6 +11,7 @@ import RiskSignalsView from './components/RiskSignals/RiskSignalsView';
 import OpportunitiesActionsView from './components/OpportunitiesActions/OpportunitiesActionsView';
 import CasesHistoryView from './components/CasesHistory/CasesHistoryView';
 import ActionCenterView from './components/ActionCenter/ActionCenterView';
+import { mergeAccounts } from './portfolioAccount';
 
 const KNOWN_VIEWS = ['usage-and-adoption', 'portfolio', 'detail', 'risk-signals', 'opportunities-and-actions', 'cases-and-history', 'action-center'];
 
@@ -28,14 +29,16 @@ export default function App() {
   };
 
   const [currentView, setCurrentView] = useState(getInitialView);
-  // Default account can be overridden with ?account=<name> (handy for sharing a link to one account)
+  // null = no account selected, so every page shows portfolio-wide data.
+  // ?account=<name> preselects an account (handy for sharing a link to one account)
   const [selectedAccountName, setSelectedAccountName] = useState(() => {
     if (typeof window !== 'undefined') {
       const fromUrl = new URLSearchParams(window.location.search).get('account');
       if (fromUrl) return fromUrl;
     }
-    return 'AFLAC Incorporated';
+    return null;
   });
+  const [fullAccounts, setFullAccounts] = useState(null);
   const [accountData, setAccountData] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [portfolioData, setPortfolioData] = useState(null);
@@ -61,22 +64,31 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Fetch accounts list and portfolio overview
+  // Fetch accounts list once, plus the full records used to build portfolio-wide views
   useEffect(() => {
     fetch('/api/accounts')
       .then(res => res.json())
       .then(data => setAllAccounts(data.accounts || []))
       .catch(err => console.error('Error fetching accounts:', err));
 
-    fetch('/api/portfolio')
+    fetch('/api/accounts-full')
+      .then(res => res.json())
+      .then(data => setFullAccounts(data.accounts || []))
+      .catch(err => console.error('Error fetching full accounts:', err));
+  }, []);
+
+  // Portfolio overview follows the selection: one account when selected, every account otherwise
+  useEffect(() => {
+    const q = selectedAccountName ? '?account=' + encodeURIComponent(selectedAccountName) : '';
+    fetch('/api/portfolio' + q)
       .then(res => res.json())
       .then(data => setPortfolioData(data.portfolio))
       .catch(err => console.error('Error fetching portfolio:', err));
-  }, []);
+  }, [selectedAccountName]);
 
   // Fetch single account data whenever selectedAccountName changes
   useEffect(() => {
-    if (!selectedAccountName) return;
+    if (!selectedAccountName) { setAccountData(null); return; }
     fetch(`/api/accounts/${encodeURIComponent(selectedAccountName)}`)
       .then(res => res.json())
       .then(data => {
@@ -105,6 +117,14 @@ export default function App() {
 
   // Account data only counts once it matches the selected account (avoids showing the previous account's data)
   const currentAccount = accountData && accountData.name === selectedAccountName ? accountData : null;
+
+  // What the Cases and Opportunities views render: the selected account, or every account merged
+  const scopeAccount = selectedAccountName
+    ? currentAccount
+    : (fullAccounts ? mergeAccounts(fullAccounts) : null);
+  const scopedAccounts = selectedAccountName
+    ? allAccounts.filter(a => a.name === selectedAccountName)
+    : allAccounts;
 
   const handleTriggerPlaybook = async () => {
     if (!accountData) return;
@@ -187,7 +207,17 @@ export default function App() {
       {/* Main Workspace Frame */}
       <div className="pl-64 flex-1">
         <main className="w-full pt-16 px-space-lg bg-transparent min-h-screen">
-          {currentView === 'detail' && (
+          {currentView === 'detail' && !selectedAccountName && (
+            <PortfolioDashboard
+              portfolio={portfolioData}
+              allAccounts={allAccounts}
+              selectedAccountName={null}
+              onSelectAccount={handleSelectAccount}
+              onExportPortfolio={() => setIsExportModalOpen(true)}
+            />
+          )}
+
+          {currentView === 'detail' && selectedAccountName && (
             <AccountDetailView
               account={accountData}
               allAccounts={allAccounts}
@@ -208,7 +238,7 @@ export default function App() {
           {currentView === 'portfolio' && (
             <PortfolioDashboard
               portfolio={portfolioData}
-              allAccounts={allAccounts}
+              allAccounts={scopedAccounts}
               selectedAccountName={selectedAccountName}
               onSelectAccount={handleSelectAccount}
               onExportPortfolio={() => setIsExportModalOpen(true)}
@@ -219,7 +249,7 @@ export default function App() {
             <UsageAdoptionView
               selectedAccountName={selectedAccountName}
               allAccounts={allAccounts}
-              onSelectAccount={handleSelectAccount}
+              onSelectAccount={handleChangeAccount}
               onNavigate={(view) => {
                 if (view === 'account-overview') {
                   setCurrentView('detail');
@@ -233,6 +263,8 @@ export default function App() {
 
           {currentView === 'risk-signals' && (
             <RiskSignalsView
+              key={selectedAccountName || 'all'}
+              selectedAccountName={selectedAccountName}
               allAccounts={allAccounts}
               onSelectAccount={handleSelectAccount}
               onToast={showToast}
@@ -241,23 +273,26 @@ export default function App() {
 
           {currentView === 'opportunities-and-actions' && (
             <OpportunitiesActionsView
-              key={selectedAccountName}
-              account={currentAccount}
+              key={selectedAccountName || 'all'}
+              account={scopeAccount}
+              isPortfolio={!selectedAccountName}
             />
           )}
 
           {currentView === 'cases-and-history' && (
             <CasesHistoryView
-              key={selectedAccountName}
-              account={currentAccount}
+              key={selectedAccountName || 'all'}
+              account={scopeAccount}
+              isPortfolio={!selectedAccountName}
               onToast={showToast}
             />
           )}
 
           {currentView === 'action-center' && (
             <ActionCenterView
-              key={selectedAccountName}
+              key={selectedAccountName || 'all'}
               account={currentAccount}
+              isPortfolio={!selectedAccountName}
               onToast={showToast}
               onSelectAccount={handleSelectAccount}
             />

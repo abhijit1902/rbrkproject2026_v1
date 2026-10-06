@@ -13,7 +13,7 @@ const TABS = [
 ];
 
 // Mounted with key={account name} so state resets when the selected account changes
-export default function CasesHistoryView({ account, onToast }) {
+export default function CasesHistoryView({ account, onToast, isPortfolio }) {
   if (!account) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -21,10 +21,10 @@ export default function CasesHistoryView({ account, onToast }) {
       </div>
     );
   }
-  return <CasesHistoryInner account={account} onToast={onToast} />;
+  return <CasesHistoryInner account={account} onToast={onToast} isPortfolio={isPortfolio} />;
 }
 
-function CasesHistoryInner({ account, onToast }) {
+function CasesHistoryInner({ account, onToast, isPortfolio }) {
   const accountName = account.name;
   const data = getCasesData(account);
   const aggregates = data.aggregates || null;
@@ -71,7 +71,7 @@ function CasesHistoryInner({ account, onToast }) {
             </span>
           </div>
           <p className="text-xs text-[#9db4e2] m-0">
-            Support, CS and renewal cases, customer interaction history, PS status and escalations for the selected account
+            {isPortfolio ? 'Support, CS and renewal cases, interaction history and escalations across all accounts' : 'Support, CS and renewal cases, customer interaction history, PS status and escalations for the selected account'}
           </p>
         </div>
         <button
@@ -131,8 +131,8 @@ function CasesHistoryInner({ account, onToast }) {
       <CaseSummaryStrip cases={teamCases} aggregates={aggregates} teamFiltered={team !== 'All'} />
 
       {/* Widgets: PS status, escalation details, AI summary */}
-      <div className="grid grid-cols-3 gap-5 mt-6">
-        <PSStatusWidget ps={data.ps} />
+      <div className={`grid gap-5 mt-6 ${isPortfolio ? 'grid-cols-2' : 'grid-cols-3'}`}>
+        {!isPortfolio && <PSStatusWidget ps={data.ps} />}
         <EscalationDetailsWidget escalations={data.escalations} />
         <CaseAISummaryWidget accountName={accountName} cases={teamCases} ps={data.ps} escalations={data.escalations} aggregates={aggregates} />
       </div>

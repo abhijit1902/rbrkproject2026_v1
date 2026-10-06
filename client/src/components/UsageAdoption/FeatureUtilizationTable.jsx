@@ -1,5 +1,8 @@
 import React from 'react';
 
+// Adoption a feature should reach; below this it is flagged
+export const ADOPTION_THRESHOLD = 75;
+
 export default function FeatureUtilizationTable({ usage }) {
   const features = usage?.featuresMatrix || [];
 
@@ -12,7 +15,7 @@ export default function FeatureUtilizationTable({ usage }) {
             <h3>Granular Feature Adoption Matrix</h3>
           </div>
           <span className="font-code-sm text-xs text-on-surface-variant font-semibold">
-            Cohort vs Account
+            Account vs {ADOPTION_THRESHOLD}% threshold
           </span>
         </div>
 
@@ -24,7 +27,7 @@ export default function FeatureUtilizationTable({ usage }) {
                 <th className="py-2.5 px-3">Feature Capability</th>
                 <th className="py-2.5 px-2">Module</th>
                 <th className="py-2.5 px-2">Account %</th>
-                <th className="py-2.5 px-2">Cohort Avg</th>
+                <th className="py-2.5 px-2">Threshold</th>
                 <th className="py-2.5 px-2">Frequency</th>
                 <th className="py-2.5 px-2">Avg Session</th>
                 <th className="py-2.5 px-2 text-right">Status</th>
@@ -32,8 +35,8 @@ export default function FeatureUtilizationTable({ usage }) {
             </thead>
             <tbody className="divide-y divide-[#3858a6]/40 font-body-sm">
               {features.map((feat, idx) => {
-                const isUnderperforming = feat.adoptionPct < feat.cohortPct - 15;
-                const isOverperforming = feat.adoptionPct > feat.cohortPct + 10;
+                const isUnderperforming = feat.adoptionPct < ADOPTION_THRESHOLD;
+                const isOverperforming = false;
 
                 return (
                   <tr
@@ -79,7 +82,7 @@ export default function FeatureUtilizationTable({ usage }) {
                       </div>
                     </td>
                     <td className="py-3 px-2 font-code-sm text-[11px]">
-                      {feat.cohortPct}%
+                      {ADOPTION_THRESHOLD}%
                     </td>
                     <td className="py-3 px-2">{feat.freq}</td>
                     <td className="py-3 px-2 font-code-sm text-[11px] text-white">
@@ -95,7 +98,7 @@ export default function FeatureUtilizationTable({ usage }) {
                             : 'bg-[#3ECF8E]/20 text-[#3ECF8E]'
                         }`}
                       >
-                        {feat.status}
+                        {isUnderperforming ? 'Below threshold' : 'Meets threshold'}
                       </span>
                     </td>
                   </tr>

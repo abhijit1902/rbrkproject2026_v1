@@ -79,14 +79,16 @@ export default function PortfolioDashboard({
             <span>Export Portfolio</span>
           </button>
 
-          <button
-            onClick={() => onSelectAccount(selectedAccountName)}
-            type="button"
-            className="px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-label-md text-xs font-bold hover:bg-primary-fixed flex items-center gap-1.5 shadow-md cursor-pointer border-0"
-          >
-            <span className="material-symbols-outlined text-[16px]">visibility</span>
-            <span>{'View ' + selectedAccountName + ' (Detail)'}</span>
-          </button>
+          {selectedAccountName && (
+            <button
+              onClick={() => onSelectAccount(selectedAccountName)}
+              type="button"
+              className="px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-label-md text-xs font-bold hover:bg-primary-fixed flex items-center gap-1.5 shadow-md cursor-pointer border-0"
+            >
+              <span className="material-symbols-outlined text-[16px]">visibility</span>
+              <span>{'View ' + selectedAccountName + ' (Detail)'}</span>
+            </button>
+          )}
         </div>
       </div>
 
